@@ -39,7 +39,7 @@ plotexpvals <- function(topdir) {
   pdf(onefile=TRUE,file="expvals.pdf",width=8,height=8)
   for( i in 1:length(samples) ) {
     skip <- FALSE
-    pat <- paste("^",samples[i],sep="")
+    pat <- paste(paste("^",samples[i],sep=""),"_",sep="")
     dirs <- list.files(topdir,pattern=pat,full.names=TRUE)
     
     evals <- expvals(dirs)
