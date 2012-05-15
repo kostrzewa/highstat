@@ -1,0 +1,38 @@
+"highstat" is a set of R scripts for the analysis of high statistics runs
+generated with the tmLQCD software package
+
+plotexpvals is a function which uses Carsten Urbach's hadron library
+to compute expectation values of the plaquette and the rectangle
+for the set of sample files of the tmLQCD software package
+under the hood it also computes the optimal autocorrelation time
+accoring to U. Wollf's method
+
+it produces three plots for each sample file, one for the plaquette expectation value
+the second for the rectangle expectation value (unless it contains no rectangle gauge
+contribution) and the third for the plaquette history (100 trajectories)
+
+the argument "topdir" must be the path to a directory which contains
+a set of subdirectories
+these subdirectories in turn relate to different runs of the different
+sample input files
+each subdirectory must contain "output.data" for the given run
+
+the names of the subdirectories should begin with the strings in the 
+"samples" vector (see plotexpvals.R)
+
+"norectsamples" is a subset of samples which do not contain a rectangle
+contribution in their gauge action (see plotexpvals.R)
+
+example directory structure
+topdir
+|
+-----> hmc0_old_serial
+|  |-> hmc0_new_serial 
+|  |-> hmc0_old_mpi
+|  |-> hmc0_new_mpi
+|
+-----> hmc1_[...]
+[...] 
+
+because of the way that the subfunctions are called this should be run
+in the directory containing the R files
