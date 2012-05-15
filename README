@@ -11,6 +11,8 @@ it produces three plots for each sample file, one for the plaquette expectation 
 the second for the rectangle expectation value (unless it contains no rectangle gauge
 contribution) and the third for the plaquette history (100 trajectories)
 
+all plots are collated into one output file, expvals.pdf
+
 the argument "topdir" must be the path to a directory which contains
 a set of subdirectories
 these subdirectories in turn relate to different runs of the different
