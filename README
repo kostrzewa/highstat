@@ -20,7 +20,8 @@ sample input files
 each subdirectory must contain "output.data" for the given run
 
 the names of the subdirectories should begin with the strings in the 
-"samples" vector (see plotexpvals.R)
+"samples" vector, separated from the rest of the filename with an underscore
+('_') (see plotexpvals.R)
 
 "norectsamples" is a subset of samples which do not contain a rectangle
 contribution in their gauge action (see plotexpvals.R)

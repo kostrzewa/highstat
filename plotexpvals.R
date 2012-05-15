@@ -17,7 +17,8 @@
 # each subdirectory must contain "output.data" for the given run
 
 # the names of the subdirectories should begin with the strings in the 
-# "samples" vector below
+# "samples" vector below, separated from the rest of the filename
+# by an underscore ('_')
 
 # "norectsamples" is a subset of samples which do not contain a rectangle
 # contribution in their gauge action
