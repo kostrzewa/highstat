@@ -14,6 +14,7 @@ plaqrect <- function(filename,norect) {
 
   plaq <- data[min:length(data[,1]),1]
   plaqres <- uwerrprimary(plaq)
+  plaqhist <- data[1:100,1]
   #plaqsum <- summary(plaqres)
 
   if(!norect) {
@@ -25,5 +26,5 @@ plaqrect <- function(filename,norect) {
   }
   #rectsum <- summary(rectres)
 
-  return(list(pl=plaqres,rec=rectres))
+  return(list(pl=plaqres,rec=rectres,plhist=plaqhist))
 }
