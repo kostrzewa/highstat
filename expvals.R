@@ -9,8 +9,6 @@
 
 source("plaqrect.R")
 
-library(multicore)
-
 expvals <- function(dirs) {
 # these are samples without a rectangular guage action, we keep track of this so
 # we don't produce excess data
@@ -22,7 +20,7 @@ expvals <- function(dirs) {
   
   # when an output file does not exist we need to keep track of how many files have been "skipped"
   skip <- 0
-  for(i in 1:length(dirs) ) {
+  for( i in 1:length(dirs) ) {
     norect <- FALSE
     print(dirs[i])
     # create a name for the row from the directory name 
