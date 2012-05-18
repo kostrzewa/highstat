@@ -43,6 +43,7 @@ expvals <- function(dirs) {
                 
       trec <- NA
       tdrec <- NA
+      trecmed <- NA
       trectauint <- NA
       trecdtauint <- NA
       
@@ -50,6 +51,7 @@ expvals <- function(dirs) {
       if( !norect ) {
         trec <- tres$rec$value
         tdrec <- tres$rec$dvalue
+        trecmed <- median(tres$rec$data[5000:length(tres$rec$data)])
         trectauint <- tres$rec$tauint
         trecdtauint <- tres$rec$dtauint
       }
@@ -57,8 +59,9 @@ expvals <- function(dirs) {
       # data frame will contain NA if rectangle part is missing, values otherwise
       tresl <- data.frame(row.names=name,
         list(plaq=tres$pl$value,dplaq=tres$pl$dvalue,
+          plaqmed=median(tres$pl$data[5000:length(tres$pl$data)]),
           plaqtauint=tres$pl$tauint,plaqdtauint=tres$pl$dtauint,
-          rec=trec,drec=tdrec,
+          rec=trec,drec=tdrec,recmed=trecmed,
           rectauint=trectauint,recdtauint=trecdtauint))
 
       # save the current state of our return value

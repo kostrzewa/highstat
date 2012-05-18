@@ -20,6 +20,7 @@ plaqrect <- function(filename,norect) {
   if(!norect) {
     rect <- data[min:length(data[,length(data)]),length(data)]
     rectres <- uwerrprimary(rect)
+    rectmed <- median(rect)
   } else {
     rect <- NA
     rectres <- NA

@@ -72,6 +72,7 @@ plotexpvals <- function(topdir) {
       if( k == 1 ) {  
         value <- evals[[1]]$plaq
         dvalue <- evals[[1]]$dplaq
+        valuemed <- evals[[1]]$plaqmed
         tauint <- evals[[1]]$plaqtauint
         dtauint <- evals[[1]]$plaqdtauint
         ref <- reference[samples[i],]$plaq
@@ -80,6 +81,7 @@ plotexpvals <- function(topdir) {
       } else if ( k == 2 ) {
         value <- evals[[1]]$rec
         dvalue <- evals[[1]]$drec
+        valuemed <- evals[[1]]$recmed
         tauint <- evals[[1]]$rectauint
         dtauint <- evals[[1]]$recdtauint
         ref <- reference[samples[i],]$rec
@@ -110,6 +112,9 @@ plotexpvals <- function(topdir) {
         plotwitherror(add=TRUE, x = length(value)+1, xlim=c(1,(length(value)+1)),
           y = ref, dy=dref, 
           col="dark red",pch=16,xaxt="n")
+
+        # display median value of the quantity
+        points(c(1:length(valuemed)),valuemed) 
 
         text(c(1:(length(value)+1)),par("usr")[3], labels = labels, 
           srt = 30, adj = c(1.1,1.1), xpd = TRUE, cex=.9)
