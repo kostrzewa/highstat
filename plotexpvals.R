@@ -100,19 +100,27 @@ plotexpvals <- function(topdir) {
       # does not contain a rectangle gauge part 
       if( !skip ) {
         par(mar=c(8.1,9.1,4.1,1.0))
-        mp <- plotwitherror(x = c(1:length(evals[[1]]$plaq)), xlim=c(1,(length(evals[[1]]$plaq)+1)),
+        mp <- plotwitherror(x = c(1:length(value)), xlim=c(1,(length(value)+1)),
          y = value, dy=dvalue, 
          main=paste(samples[i],paste(name,"exp. value")), 
          xlab="",ylab=name,xaxt="n",pch=16)
       
-        axis(1,labels=FALSE)
+        axis(1,labels=FALSE,tick=FALSE)
 
-        plotwitherror(add=TRUE, x = length(evals[[1]]$plaq)+1, xlim=c(1,(length(evals[[1]]$plaq)+1)),
+        plotwitherror(add=TRUE, x = length(value)+1, xlim=c(1,(length(value)+1)),
           y = ref, dy=dref, 
-          col="dark red",pch=16)
+          col="dark red",pch=16,xaxt="n")
 
-        text(c(1:(length(evals[[1]]$plaq)+1)),par("usr")[3], labels = labels, 
+        text(c(1:(length(value)+1)),par("usr")[3], labels = labels, 
           srt = 30, adj = c(1.1,1.1), xpd = TRUE, cex=.9)
+
+        # display autocorrelation times on the plot
+        rounded <- round(tauint,digits=5)
+        for( k in 1:length(value) ) {
+          tauintlabel <- bquote(tau[int] == .(rounded[k]) )
+          text(x=k,y=par("usr")[3],labels=tauintlabel,srt=50,
+            adj = c(-0.1,-0.1), xpd = TRUE, cex=.9) 
+        }
       }
     }
 
