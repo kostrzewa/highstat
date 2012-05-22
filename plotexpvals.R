@@ -50,7 +50,7 @@ plotexpvals <- function(topdir) {
   # these are reference values for the plaquette and rectangle expectation value 
   reference <- read.table("reference.dat", fill=TRUE)
    
-  pdf(onefile=TRUE,file="expvals.pdf",width=8,height=8)
+ pdf(onefile=TRUE,file="expvals.pdf",width=8,height=8)
 
   for( i in 1:length(samples) ) {
     skip <- FALSE
@@ -102,20 +102,25 @@ plotexpvals <- function(topdir) {
       # does not contain a rectangle gauge part 
       if( !skip ) {
         par(mar=c(8.1,9.1,4.1,1.0))
-        mp <- plotwitherror(x = c(1:length(value)), xlim=c(1,(length(value)+1)),
+
+        plotwitherror(x = c(1:length(value)), xlim=c(1,(length(value)+1)),
          y = value, dy=dvalue, 
          main=paste(samples[i],paste(name,"exp. value")), 
          xlab="",ylab=name,xaxt="n",pch=16)
-      
+     
         axis(1,labels=FALSE,tick=FALSE)
 
         plotwitherror(add=TRUE, x = length(value)+1, xlim=c(1,(length(value)+1)),
           y = ref, dy=dref, 
           col="dark red",pch=16,xaxt="n")
+        
+        # add a vertical grid to make identifying runs easier 
+        abline(v=(seq(1,(length(value)+1),1)), col="lightgray",lty="dashed")
 
         # display median value of the quantity
         points(c(1:length(valuemed)),valuemed) 
 
+        # print names of data sets
         text(c(1:(length(value)+1)),par("usr")[3], labels = labels, 
           srt = 30, adj = c(1.1,1.1), xpd = TRUE, cex=.9)
 
@@ -138,6 +143,6 @@ plotexpvals <- function(topdir) {
     text(x=seq(1,50*(length(evals)-1),50),par("usr")[3], labels = labels[1:(length(evals)-1)], 
      srt = 30, adj = c(1.1,1.1), xpd = TRUE, cex=.9)
   }
-  dev.off();
+ dev.off();
 }
  
