@@ -4,11 +4,12 @@
 # under the hood it also computes the optimal autocorrelation time
 # accoring to U. Wollf's method
 
-# it produces three plots for each sample file, one for the plaquette expectation value
-# the second for the rectangle expectation value (unless it contains no rectangle gauge
-# contribution) and the third for the plaquette history (100 trajectories)
-
-# all plots are collated into one output file, "expvals.pdf"
+# it produces two to three files for each sample file,
+# the first file contains a plot for for the plaquette expectation value, one for
+# the rectangle expectation value (unless it contains no rectangle gauge contribution), 
+# and one plot each for the first 100 trajectories of the plaquette and rectangle
+# histories (as available)
+# the second and third files contain complete histories of the plaquette and rectangle part
 
 # the argument "topdir" must be the path to a directory which contains
 # a set of subdirectories
@@ -41,6 +42,8 @@ library(hadron)
 
 source("expvals.R")
 
+subdir <- "plots"
+
 plotexpvals <- function(topdir) {
   samples <- c("hmc0","hmc1","hmc2","hmc3","hmc4","hmc-cloverdet","hmc-tmcloverdet","hmc-tmcloverdetratio")
   
@@ -50,9 +53,8 @@ plotexpvals <- function(topdir) {
   # these are reference values for the plaquette and rectangle expectation value 
   reference <- read.table("reference.dat", fill=TRUE)
    
- pdf(onefile=TRUE,file="expvals.pdf",width=8,height=8)
-
   for( i in 1:length(samples) ) {
+    pdf(onefile=TRUE,file=paste(subdir,paste(samples[i],"expvals.pdf",sep="_"),sep="/"),width=8,height=8)
     skip <- FALSE
     pat <- paste(paste("^",samples[i],sep=""),"_",sep="")
 
@@ -99,7 +101,7 @@ plotexpvals <- function(topdir) {
 
    
       # plot the plaquette / rectangle expectation value, skip if this sample
-      # does not contain a rectangle gauge part 
+      # does not contain a rectangle gauge part (the for loop over k)
       if( !skip ) {
         par(mar=c(8.1,9.1,4.1,1.0))
 
@@ -134,15 +136,44 @@ plotexpvals <- function(topdir) {
       }
     }
 
-    # plot plaquette histories now
-    plot(xlab="",ylab="plaquette",y=evals[[2]], x=c(1:100), 
-      main=paste( samples[i], "plaquette history"),xlim=c(1,50*length(evals)),xaxt="n",lty=1,type="l")
-    for(j in 3:length(evals) ) {
-      lines(evals[[j]], x=c(1:100)+(j-2)*50) 
+    # evals contains the statistical results in [[1]] and for each output.data 
+    # one plaquette and one rectangle history in [[2*j]] and [[2*j+1]] respectively
+    # the total number of histories for this sample is thus:
+    number <- ((length(evals)-1)/2)
+
+    # plot initial plaquette histories now
+    plot(xlab="",ylab="plaquette",y=evals[[2]][1:100],x=c(1:100), 
+      main=paste( samples[i], "plaquette history"),xlim=c(1,50*number),xaxt="n",lty=1,type="l")
+    for(j in 2:number ) {
+      lines(evals[[2*j]][1:100], x=c(1:100)+(j-1)*50) 
     }
-    text(x=seq(1,50*(length(evals)-1),50),par("usr")[3], labels = labels[1:(length(evals)-1)], 
+    text(x=seq(1,50*number,50),par("usr")[3], labels = labels[1:number], 
      srt = 30, adj = c(1.1,1.1), xpd = TRUE, cex=.9)
+    # close the expvals file for the current sample
+    dev.off();
+
+    # plot full plaquette histories in a separate file
+    pdf(onefile=TRUE,file=paste(subdir,paste(samples[i],"pl_history.pdf",sep="_"),sep="/"),width=8,height=8)
+    for( j in 1:number ) {
+      plot(evals[[2*j]],x=c(1:length(evals[[2*j]])),type="l",lty=1,main=paste(labels[j],"plaquette history"),xlab="trajectory",ylab="plaquette")
+    }
+    dev.off();
+
+    skip <- FALSE
+    for( j in c(1:length(norectsamples)) ) {
+      if( samples[i] == norectsamples[j] ) {
+        skip = TRUE
+      }
+    }
+    
+    if( !skip ) {
+      # plot rectangle histories if this sample has a rectangle gauge part
+      pdf(onefile=TRUE,file=paste(subdir,paste(samples[i],"rec_history.pdf",sep="_"),sep="/"),width=8,height=8)
+      for( j in 1:number ) {
+        plot(evals[[2*j+1]],x=c(1:length(evals[[2*j+1]])),type="l",lty=1,main=paste(labels[j],"rectangle history"),xlab="trajectory",ylab="rectangle")
+      }
+      dev.off();
+    }
   }
- dev.off();
 }
  

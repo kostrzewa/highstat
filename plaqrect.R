@@ -8,24 +8,23 @@ library(hadron)
 plaqrect <- function(filename,norect) {
   data <- read.table(filename)
   min <- 5000
-  if( length(data[,1]) > 2000 ) {
+  if( length(data[,1]) < 5000 ) {
     min <- 2000
   }
 
   plaq <- data[min:length(data[,1]),1]
   plaqres <- uwerrprimary(plaq)
-  plaqhist <- data[1:100,1]
-  #plaqsum <- summary(plaqres)
+  plaqhist <- data[,1]
 
   if(!norect) {
     rect <- data[min:length(data[,length(data)]),length(data)]
     rectres <- uwerrprimary(rect)
-    rectmed <- median(rect)
+    recthist <- data[,length(data)]
   } else {
     rect <- NA
     rectres <- NA
+    recthist <- NA
   }
-  #rectsum <- summary(rectres)
 
-  return(list(pl=plaqres,rec=rectres,plhist=plaqhist))
+  return(list(pl=plaqres,rec=rectres,plhist=plaqhist,rechist=recthist))
 }

@@ -39,13 +39,14 @@ expvals <- function(dirs) {
     if(file.exists(ofile)) {
       tres <- plaqrect(ofile,norect)
   
-      res[[i+1-skip]] <- tres$plhist
+      res[[2*i+1-2*skip]] <- tres$plhist
                 
       trec <- NA
       tdrec <- NA
       trecmed <- NA
       trectauint <- NA
       trecdtauint <- NA
+      trechist <- NA
       
       # if we have a rectangle part, read out values into temporary variables
       if( !norect ) {
@@ -54,7 +55,12 @@ expvals <- function(dirs) {
         trecmed <- median(tres$rec$data[5000:length(tres$rec$data)])
         trectauint <- tres$rec$tauint
         trecdtauint <- tres$rec$dtauint
+        trechist <- tres$rechist
       }
+
+      # add plaquette history and (possibly NA) rectangle history to return value
+      res[[2*i-2*skip]] <- tres$plhist
+      res[[2*i+1-2*skip]] <- trechist
 
       # data frame will contain NA if rectangle part is missing, values otherwise
       tresl <- data.frame(row.names=name,
