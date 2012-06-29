@@ -45,10 +45,10 @@ source("expvals.R")
 subdir <- "plots"
 
 plotexpvals <- function(topdir) {
-  samples <- c("hmc0","hmc1","hmc2","hmc3","hmc4","hmc-cloverdet","hmc-tmcloverdet","hmc-tmcloverdetratio")
+  samples <- c("hmc0","hmc1","hmc2","hmc3","hmc4","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
   
   # these samples do not contain a rectangular gauge part
-  norectsamples <- c("hmc0","hmc1","hmc-cloverdet","hmc-tmcloverdet","hmc-tmcloverdetratio")
+  norectsamples <- c("hmc0","hmc1","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
  
   # these are reference values for the plaquette and rectangle expectation value 
   reference <- read.table("reference.dat", fill=TRUE)
