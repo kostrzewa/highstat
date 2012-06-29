@@ -12,7 +12,7 @@ source("plaqrect.R")
 expvals <- function(dirs) {
 # these are samples without a rectangular guage action, we keep track of this so
 # we don't produce excess data
-  norectsamples <- c("hmc0","hmc1","hmc-cloverdet","hmc-tmcloverdet","hmc-tmcloverdetratio")
+  norectsamples <- c("hmc0","hmc1","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
   
   res <- list()
 # create an empty data frame so that res[[1]] exists!
@@ -52,7 +52,7 @@ expvals <- function(dirs) {
       if( !norect ) {
         trec <- tres$rec$value
         tdrec <- tres$rec$dvalue
-        trecmed <- median(tres$rec$data[5000:length(tres$rec$data)])
+        trecmed <- median(tres$rec$data[10000:length(tres$rec$data)])
         trectauint <- tres$rec$tauint
         trecdtauint <- tres$rec$dtauint
         trechist <- tres$rechist
@@ -65,7 +65,7 @@ expvals <- function(dirs) {
       # data frame will contain NA if rectangle part is missing, values otherwise
       tresl <- data.frame(row.names=name,
         list(plaq=tres$pl$value,dplaq=tres$pl$dvalue,
-          plaqmed=median(tres$pl$data[5000:length(tres$pl$data)]),
+          plaqmed=median(tres$pl$data[10000:length(tres$pl$data)]),
           plaqtauint=tres$pl$tauint,plaqdtauint=tres$pl$dtauint,
           rec=trec,drec=tdrec,recmed=trecmed,
           rectauint=trectauint,recdtauint=trecdtauint))
