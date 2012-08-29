@@ -45,7 +45,7 @@ source("expvals.R")
 subdir <- "plots"
 
 plotexpvals <- function(topdir) {
-  samples <- c("hmc0","hmc1","hmc2","hmc3","hmc4","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
+  samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
   
   # these samples do not contain a rectangular gauge part
   norectsamples <- c("hmc0","hmc1","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
