@@ -35,11 +35,11 @@ expvals <- function(dirs) {
       }
     }
 
-    ofile <- paste(dirs[i],"/output.data",sep="") 
-    if(file.exists(ofile)) {
+    ofile <- paste(dirs[i],"/output.data",sep="")
+    
+    if( file.exists(ofile) && ( as.integer( strsplit( system(paste("wc -l",ofile),intern=TRUE), " ")[[1]][[1]] ) > 11000 ) ) {
+
       tres <- plaqrect(ofile,norect)
-  
-      res[[2*i+1-2*skip]] <- tres$plhist
                 
       trec <- NA
       tdrec <- NA
@@ -74,11 +74,13 @@ expvals <- function(dirs) {
       tres <- res[[1]]
       # collate our new data frame with the current state
       res[[1]] <- rbind(tres,tresl)
-    } else {
+    } else if ( ! file.exists(ofile) )  {
       print(paste(ofile,"does not exist! Skipping."))
+      skip <- skip+1
+    } else if ( as.integer( strsplit( system(paste("wc -l",ofile),intern=TRUE), " ")[[1]][[1]] ) < 11000 ) {
+      print(paste(ofile,"has less than 11000 lines! Skipping."))
       skip <- skip+1
     }
   }
-
   return(res)
 }

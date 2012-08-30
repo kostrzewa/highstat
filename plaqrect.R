@@ -7,6 +7,10 @@ library(hadron)
 
 plaqrect <- function(filename,norect) {
   data <- read.table(filename)
+  if( length(data[,1]) < 11000 ) {
+    return(NA)
+  }
+
   min <- 10000
 
   plaq <- data[min:length(data[,1]),1]
