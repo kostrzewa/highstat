@@ -45,8 +45,8 @@ source("expvals.R")
 subdir <- "plots"
 
 plotexpvals <- function(topdir) {
-  samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
-  
+  samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_ndclover","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
+
   # these samples do not contain a rectangular gauge part
   norectsamples <- c("hmc0","hmc1","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
  
@@ -153,7 +153,7 @@ plotexpvals <- function(topdir) {
       # plot initial plaquette histories now
       plot(xlab="",ylab="plaquette",y=evals[[2]][1:100],x=c(1:100), 
         main=paste( samples[i], "plaquette history"),xlim=c(1,50*number),xaxt="n",lty=1,type="l")
-      for(j in 2:number ) {
+      for(j in 1:number ) {
         lines(evals[[2*j]][1:100], x=c(1:100)+(j-1)*50) 
       }
       text(x=seq(1,50*number,50),par("usr")[3], labels = labels[1:number], 

@@ -7,15 +7,16 @@ library(hadron)
 
 plaqrect <- function(filename,norect) {
   data <- read.table(filename)
-  if( length(data[,1]) < 11000 ) {
+  # old format without iteration counter -> data[,1] is the plaquette!
+  if( length(data[,2]) < 11000 ) {
     return(NA)
   }
 
   min <- 10000
 
-  plaq <- data[min:length(data[,1]),1]
+  plaq <- data[min:length(data[,2]),2]
   plaqres <- uwerrprimary(plaq)
-  plaqhist <- data[,1]
+  plaqhist <- data[,2]
 
   if(!norect) {
     rect <- data[min:length(data[,length(data)]),length(data)]
