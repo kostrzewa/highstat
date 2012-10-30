@@ -27,6 +27,8 @@ expvals <- function(dirs) {
     dirsplit <- strsplit(dirs[i],'/')
     name <- dirsplit[[1]][length(dirsplit[[1]])] 
 
+
+    # this is a problem...
     # test if the current filename refers to one of the samples without a rectangular part
     for( k in c(1:length(norectsamples)) ) {
       test <- grep(name,pattern=norectsamples[k],fixed=TRUE)
@@ -36,8 +38,17 @@ expvals <- function(dirs) {
     }
 
     ofile <- paste(dirs[i],"/output.data",sep="")
+    stdout <- list.files(dirs[i],pattern="stdout*",full.names=TRUE)
     
     if( file.exists(ofile) && ( as.integer( strsplit( system(paste("wc -l",ofile),intern=TRUE), " ")[[1]][[1]] ) > 11000 ) ) {
+      
+      if( length(stdout) > 0 && file.exists(stdout) ) {
+        grepcommand <- paste("grep 'Acceptance rate'",stdout)
+        grepcommand <- paste(grepcommand,"| awk '{print $5}'")
+        tar <- as.numeric(system(intern=TRUE, grepcommand))
+      } else {
+        tar <- NA
+      }
 
       tres <- plaqrect(ofile,norect)
                 
@@ -64,7 +75,7 @@ expvals <- function(dirs) {
 
       # data frame will contain NA if rectangle part is missing, values otherwise
       tresl <- data.frame(row.names=name,
-        list(plaq=tres$pl$value,dplaq=tres$pl$dvalue,
+        list(ar=tar,plaq=tres$pl$value,dplaq=tres$pl$dvalue,
           plaqmed=median(tres$pl$data[10000:length(tres$pl$data)]),
           plaqtauint=tres$pl$tauint,plaqdtauint=tres$pl$dtauint,
           rec=trec,drec=tdrec,recmed=trecmed,

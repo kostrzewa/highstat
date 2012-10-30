@@ -45,7 +45,8 @@ source("expvals.R")
 subdir <- "plots"
 
 plotexpvals <- function(topdir) {
-  samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_ndclover","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
+  #samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_ndclover","hmc_ndclover_nocsw","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
+  samples <- c("hmc0","hmc1","hmc3","hmc2","hmc_tmcloverdetratio","hmc_cloverdet","hmc_tmcloverdet","hmc_ndclover","hmc_nocsw_ndclover","hmc_nosplit_ndclover","hmc_nosplit_nocsw_ndclover","hmc_check_ndclover_tmcloverdet","hmc_check_ndclover_nocsw_tmcloverdet")
 
   # these samples do not contain a rectangular gauge part
   norectsamples <- c("hmc0","hmc1","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
@@ -80,7 +81,8 @@ plotexpvals <- function(topdir) {
       # we collect the values in temporary variables so we have to write the 
       # plotting routine only once
       for( k in c(1:2) ) {
-        if( k == 1 ) {  
+        if( k == 1 ) {
+          ar <- evals[[1]]$ar  
           value <- evals[[1]]$plaq
           dvalue <- evals[[1]]$dplaq
           valuemed <- evals[[1]]$plaqmed
@@ -90,6 +92,7 @@ plotexpvals <- function(topdir) {
           dref <- reference[samples[i],]$dplaq
           name <- "plaquette"
         } else if ( k == 2 ) {
+          ar <- evals[[1]]$ar
           value <- evals[[1]]$rec
           dvalue <- evals[[1]]$drec
           valuemed <- evals[[1]]$recmed
@@ -142,6 +145,14 @@ plotexpvals <- function(topdir) {
             text(x=k,y=par("usr")[3],labels=tauintlabel,srt=50,
               adj = c(-0.1,-0.1), xpd = TRUE, cex=.9) 
           }
+
+          # display acceptance rate 
+          for( k in 1:length(value) ) {
+            ARlabel <- bquote(AR == .(ar[k]) )
+            text(x=k,y=par("usr")[3],labels=ARlabel,srt=50,
+              adj = c(-0.3,-2.0), xpd = TRUE, cex = .9)
+          }
+
         }
       }
 
