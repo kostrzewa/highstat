@@ -7,7 +7,7 @@
 # and the rectangle (and their errors) in res[[1]] and the first hundred values of
 # the plaquette evolution for each output file in res[[n>1]]
 
-source("plaqrect.R")
+source("readoutput.R")
 
 expvals <- function(dirs) {
 # these are samples without a rectangular guage action, we keep track of this so
@@ -65,7 +65,7 @@ expvals <- function(dirs) {
         tar <- NA
       }
 
-      tres <- plaqrect(ofile,norect,format,ndclover)
+      tres <- readoutput(ofile,norect,format,ndclover)
                 
       trec <- NA
       tdrec <- NA

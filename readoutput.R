@@ -8,7 +8,7 @@
 
 library(hadron)
 
-plaqrect <- function(filename,norect,format,ndclover) {
+readoutput <- function(filename,norect,format,ndclover) {
 
   data <- read.table(filename)
  
