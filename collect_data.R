@@ -1,7 +1,8 @@
-# given a vector of directories containing output.data, call plaqrect
+# given a vector of directories containing output.data, call readoutput
 # to get expectation value and uwerr of plaquette and rectangular
 # plaquette, further, collect first 100 trajectories of plaquette history
-# from plaqrect
+# further, collect mean number of CG iterations in derivative of first monomial
+# and mean trajectory time
 
 # res is our return value, it will be a list with the expectation value of the plaquette
 # and the rectangle (and their errors) in res[[1]] and the first hundred values of
@@ -9,7 +10,7 @@
 
 source("readoutput.R")
 
-expvals <- function(dirs) {
+collect_data <- function(dirs) {
 # these are samples without a rectangular guage action, we keep track of this so
 # we don't produce excess data
   norectsamples <- c("hmc0","hmc1","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")

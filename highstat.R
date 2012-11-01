@@ -1,4 +1,4 @@
-# plotexpvals is a function which uses Carsten Urbach's hadron library
+# highstat is a function which uses Carsten Urbach's hadron library
 # to compute expectation values of the plaquette and the rectangle
 # for the set of sample files of the tmLQCD software package
 # under the hood it also computes the optimal autocorrelation time
@@ -6,12 +6,14 @@
 
 # it produces two to three files for each sample file,
 # the first file contains a plot for for the plaquette expectation value, one for
-# the rectangle expectation value (unless it contains no rectangle gauge contribution), 
+# the rectangle expectation value (unless it contains no rectangle gauge contribution),
+# one plot for the cumulative CG iterations of the derivative of the first monomial,
+# one plot for the mean time per trajactory 
 # and one plot each for the first 100 trajectories of the plaquette and rectangle
 # histories (as available)
 # the second and third files contain complete histories of the plaquette and rectangle part
 
-# the argument "topdir" must be the path to a directory which contains
+# the argument "tdir" must be the path to a directory which contains
 # a set of subdirectories
 # these subdirectories in turn relate to different runs of the different
 # sample input files
@@ -21,11 +23,17 @@
 # "samples" vector below, separated from the rest of the filename
 # by an underscore ('_')
 
+# the rest of the filename is referred to as an "addon" in several places
+# in the code, this "addon" should differentiate the various runs of the
+# same sample file. For instance, this could be different parallelizations.
+#    e.g. mpi, mpi_hs, serial, hybrid_hs etc..
+# or maybe different versions of the executable used to generate the data
+
 # "norectsamples" is a subset of samples which do not contain a rectangle
 # contribution in their gauge action
 
 # example directory structure
-# topdir
+# tdir
 # |
 # -----> hmc0_old_serial
 # |  |-> hmc0_new_serial 
@@ -36,12 +44,12 @@
 # [...] 
 
 # because of the way that the subfunctions are called this should be run
-# in the directory containing the R files
+# in the directory containing the R files by first calling
+#    source("highstat.R")
 
 library(hadron)
 library(multicore)
 
-source("expvals.R")
 source("plotfunc.R")
 
 # we use global variables to enable parallelization
@@ -58,8 +66,8 @@ topdir
 topdirname 
 subdir
 
-plotexpvals <- function(x) {
-  topdir <<- x
+highstat <- function(tdir) {
+  topdir <<- tdir
 
   # extract the "name" of the top directory
   topdirsplit <- strsplit(topdir,'/')

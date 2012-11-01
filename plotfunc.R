@@ -1,3 +1,5 @@
+source("collect_data.R")
+
 plotfunc <- function(sample) {
   pdf(onefile=TRUE,file=paste(subdir,paste(sample,"expvals.pdf",sep="_"),sep="/"),width=8,height=8)
   pat <- paste(paste("^",sample,sep=""),"_",sep="")
@@ -5,19 +7,19 @@ plotfunc <- function(sample) {
   # find the subdirectories which refer to the current sample
   dirs <- list.files(topdir,pattern=pat,full.names=TRUE)
 
-  evals <- expvals(dirs)
+  data <- collect_data(dirs)
 
-  # when the length of evals is 1, none of the output.data in this sample was suitable 
+  # when the length of data is 1, none of the output.data in this sample was suitable 
   # either none of them existed or none had a sufficient number of lines
   skipall <- FALSE
-  if( length(evals) < 2 ) {
+  if( length(data) < 2 ) {
     skipall <- TRUE
   }
 
   if( !skipall ) {
 
     # extract the names of the subdirectories for this sample set
-    labels <- row.names(evals[[1]])
+    labels <- row.names(data[[1]])
     labels <- append(labels,"reference")
 
     # extract the "addon" from the labels (ie. serial, mpi_hs etc..)
@@ -29,32 +31,32 @@ plotfunc <- function(sample) {
     for( k in c(1:4) ) {
       skip <- FALSE
       if( k == 1 ) {
-        ar <- evals[[1]]$ar  
-        value <- evals[[1]]$plaq
-        dvalue <- evals[[1]]$dplaq
-        valuemed <- evals[[1]]$plaqmed
-        tauint <- evals[[1]]$plaqtauint
-        dtauint <- evals[[1]]$plaqdtauint
+        ar <- data[[1]]$ar  
+        value <- data[[1]]$plaq
+        dvalue <- data[[1]]$dplaq
+        valuemed <- data[[1]]$plaqmed
+        tauint <- data[[1]]$plaqtauint
+        dtauint <- data[[1]]$plaqdtauint
         ref <- reference[sample,]$plaq
         dref <- reference[sample,]$dplaq
         name <- "plaquette"
         postname <- "exp. value"
       } else if ( k == 2 ) {
-        ar <- evals[[1]]$ar
-        value <- evals[[1]]$rec
-        dvalue <- evals[[1]]$drec
-        valuemed <- evals[[1]]$recmed
-        tauint <- evals[[1]]$rectauint
-        dtauint <- evals[[1]]$recdtauint
+        ar <- data[[1]]$ar
+        value <- data[[1]]$rec
+        dvalue <- data[[1]]$drec
+        valuemed <- data[[1]]$recmed
+        tauint <- data[[1]]$rectauint
+        dtauint <- data[[1]]$recdtauint
         ref <- reference[sample,]$rec
         dref <- reference[sample,]$drec
         name <- "rectangle"
         postname <- "exp. value"
       } else if ( k == 3 ) {
         ar <- NA
-        value <- evals[[1]]$trajtime
-        dvalue <- evals[[1]]$dtrajtime
-        valuemed <- evals[[1]]$trajtimemed
+        value <- data[[1]]$trajtime
+        dvalue <- data[[1]]$dtrajtime
+        valuemed <- data[[1]]$trajtimemed
         tauint <- NA
         dtauint <- NA
         ref <- NA
@@ -63,9 +65,9 @@ plotfunc <- function(sample) {
         postname <- "mean"
       } else if ( k == 4 ) {
         ar <- NA
-        value <- evals[[1]]$cgitnum
-        dvalue <- evals[[1]]$dcgitnum
-        valuemed <- evals[[1]]$cgitnummed
+        value <- data[[1]]$cgitnum
+        dvalue <- data[[1]]$dcgitnum
+        valuemed <- data[[1]]$cgitnummed
         tauint <- NA
         dtauint <- NA
         ref <- NA
@@ -131,19 +133,19 @@ plotfunc <- function(sample) {
 
     } # loop over k, plotting plaquette, rectangle, CG time etc..
 
-    # evals contains the statistical results in [[1]] and for each output.data 
+    # data contains the statistical results in [[1]] and for each output.data 
     # one plaquette and one rectangle history in [[2*j]] and [[2*j+1]] respectively
     # the total number of histories for this sample is thus:
-    number <- ((length(evals)-1)/2)
+    number <- ((length(data)-1)/2)
 
     title <- paste(sample,"initial plaquette history\n")
     title <- paste(title,topdirname)
 
     # plot initial plaquette histories now
-    plot(xlab="",ylab="plaquette",y=evals[[2]][1:100],x=c(1:100), 
+    plot(xlab="",ylab="plaquette",y=data[[2]][1:100],x=c(1:100), 
       main=title,xlim=c(1,50*number),xaxt="n",lty=1,type="l")
     for(j in 1:number ) {
-      lines(evals[[2*j]][1:100], x=c(1:100)+(j-1)*50) 
+      lines(data[[2*j]][1:100], x=c(1:100)+(j-1)*50) 
     }
     # add a vertical grid to make identifying runs easier 
     abline(v=(seq(1,50*length(value),50)), col="lightgray",lty="dashed")
@@ -158,7 +160,7 @@ plotfunc <- function(sample) {
     for( j in 1:number ) {
       title <- paste(labels[j],"plaquette history\n")
       title <- paste(title,topdirname)
-      plot(evals[[2*j]],x=c(1:length(evals[[2*j]])),type="l",lty=1,main=title,xlab="trajectory",ylab="plaquette")
+      plot(data[[2*j]],x=c(1:length(data[[2*j]])),type="l",lty=1,main=title,xlab="trajectory",ylab="plaquette")
     }
     dev.off();
 
@@ -173,7 +175,7 @@ plotfunc <- function(sample) {
       # plot rectangle histories if this sample has a rectangle gauge part
       pdf(onefile=TRUE,file=paste(subdir,paste(sample,"rec_history.pdf",sep="_"),sep="/"),width=8,height=8)
       for( j in 1:number ) {
-        plot(evals[[2*j+1]],x=c(1:length(evals[[2*j+1]])),type="l",lty=1,main=paste(labels[j],"rectangle history"),xlab="trajectory",ylab="rectangle")
+        plot(data[[2*j+1]],x=c(1:length(data[[2*j+1]])),type="l",lty=1,main=paste(labels[j],"rectangle history"),xlab="trajectory",ylab="rectangle")
       }
       dev.off();
     }
