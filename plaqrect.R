@@ -1,32 +1,63 @@
 # given output.data of a high statistics run, plaqrect produces expectation
 # values and errors based on uwerrprimary
-# norect signifies that this output.data does not have a column for the
+# norect (boolean) signifies that this output.data does not have a column for the
 # rectangle
+# format=1,0 specifies whether this is an output file in the new format (with n+1 colums)
+# or in the old format without an iteration counter (and hence n columns)
+
 
 library(hadron)
 
-plaqrect <- function(filename,norect) {
+plaqrect <- function(filename,norect,format,ndclover) {
+
   data <- read.table(filename)
-  # old format without iteration counter -> data[,1] is the plaquette!
-  if( length(data[,2]) < 11000 ) {
+ 
+  pcol <- format+1
+  reccol <- length(data)
+
+  # temporary workaround for broken output.data due to CLOVERNDTRLOG
+  if( ndclover ) {
+    cgitnumcol <- format+5+2
+  } else {
+    cgitnumcol <- format+5
+  }
+
+  if(norect) {
+    trajtimecol <- length(data)
+  } else {
+    trajtimecol <- length(data)-1
+  }
+
+  if( length(data[,pcol]) < 11000 ) {
     return(NA)
   }
 
-  min <- 10000
+  min <- 5000
+  max <- length(data[,pcol])
 
-  plaq <- data[min:length(data[,2]),2]
+  trajtimet <- mean(data[min:max,trajtimecol])
+  dtrajtimet <- sd(data[min:max,trajtimecol])
+  trajtimemedt <- median(data[min:max,trajtimecol])
+
+  cgitnumt <- mean(data[min:max,cgitnumcol])
+  dcgitnumt <- sd(data[min:max,cgitnumcol])
+  cgitnummedt <- median(data[min:max,cgitnumcol])
+
+  plaq <- data[min:max,pcol]
   plaqres <- uwerrprimary(plaq)
-  plaqhist <- data[,2]
+  plaqhist <- data[,pcol]
 
   if(!norect) {
-    rect <- data[min:length(data[,length(data)]),length(data)]
+    rect <- data[min:max,reccol]
     rectres <- uwerrprimary(rect)
-    recthist <- data[,length(data)]
+    recthist <- data[,reccol]
   } else {
     rect <- NA
     rectres <- NA
     recthist <- NA
   }
 
-  return(list(pl=plaqres,rec=rectres,plhist=plaqhist,rechist=recthist))
+  return(list(cgitnum=cgitnumt,dcgitnum=dcgitnumt,cgitnummed=cgitnummedt,
+    trajtime=trajtimet,dtrajtime=dtrajtimet,trajtimemed=trajtimemedt,
+    pl=plaqres,rec=rectres,plhist=plaqhist,rechist=recthist))
 }

@@ -37,6 +37,21 @@ expvals <- function(dirs) {
       }
     }
 
+    # the old output.data format had no trajectory counter
+    # the new format therefore shifted all output to the right (format == 1)
+    if( length( grep(dirs[i],pattern="5.1.6",fixed=TRUE) ) > 0 ) {
+      format <- 0
+    } else {
+      format <- 1
+    }
+
+    # workaround for temporarily broken output.data due to CLOVERNDTRLOG
+    if( length( grep(name,pattern="ndclover") ) > 0 && length( grep(name,pattern="check_ndclover") ) == 0 ) {
+      ndclover <- TRUE
+    } else {
+      ndclover <- FALSE
+    }
+
     ofile <- paste(dirs[i],"/output.data",sep="")
     stdout <- list.files(dirs[i],pattern="stdout*",full.names=TRUE)
     
@@ -50,7 +65,7 @@ expvals <- function(dirs) {
         tar <- NA
       }
 
-      tres <- plaqrect(ofile,norect)
+      tres <- plaqrect(ofile,norect,format,ndclover)
                 
       trec <- NA
       tdrec <- NA
@@ -75,11 +90,12 @@ expvals <- function(dirs) {
 
       # data frame will contain NA if rectangle part is missing, values otherwise
       tresl <- data.frame(row.names=name,
-        list(ar=tar,plaq=tres$pl$value,dplaq=tres$pl$dvalue,
-          plaqmed=median(tres$pl$data[10000:length(tres$pl$data)]),
+        list(ar=tar,
+          trajtime=tres$trajtime,dtrajtime=tres$dtrajtime,trajtimemed=tres$trajtimemed,
+          cgitnum=tres$cgitnum,dcgitnum=tres$dcgitnum,cgitnummed=tres$cgitnummed,
+          plaq=tres$pl$value,dplaq=tres$pl$dvalue,plaqmed=median(tres$pl$data[10000:length(tres$pl$data)]),
           plaqtauint=tres$pl$tauint,plaqdtauint=tres$pl$dtauint,
-          rec=trec,drec=tdrec,recmed=trecmed,
-          rectauint=trectauint,recdtauint=trecdtauint))
+          rec=trec,drec=tdrec,recmed=trecmed,rectauint=trectauint,recdtauint=trecdtauint))
 
       # save the current state of our return value
       tres <- res[[1]]
