@@ -83,7 +83,7 @@ plotfunc <- function(sample) {
       # plot the expectation value, skip if this sample does not contain
       # does not contain the particular value (e.g. rectangle in the test above)
       if( !skip ) {
-        par(mar=c(8.1,9.1,4.1,1.0))
+        par(mar=c(6.1,6.1,4.1,1.0))
 
         title <- paste(sample,paste(name,postname))
         title <- paste(title,"\n")
