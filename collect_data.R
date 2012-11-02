@@ -53,6 +53,14 @@ collect_data <- function(dirs) {
       ndclover <- FALSE
     }
 
+    # some samples do not have a CG in the HMC so we don't need to plot this
+    if( length( grep(name,pattern="nosplit_ndclover") ) > 0 || 
+        length( grep(name,pattern="nosplit_nocsw_ndclover") ) ) {
+      nocg <- TRUE
+    } else {
+      nocg <- FALSE
+    }
+
     ofile <- paste(dirs[i],"/output.data",sep="")
     stdout <- list.files(dirs[i],pattern="stdout*",full.names=TRUE)
     
@@ -66,7 +74,7 @@ collect_data <- function(dirs) {
         tar <- NA
       }
 
-      tres <- readoutput(ofile,norect,format,ndclover)
+      tres <- readoutput(ofile,norect,format,ndclover,nocg)
                 
       trec <- NA
       tdrec <- NA

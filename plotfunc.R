@@ -29,7 +29,7 @@ plotfunc <- function(sample) {
     # we collect the values in temporary variables so we have to write the 
     # plotting routine only once
     for( k in c(1:4) ) {
-      skip <- FALSE
+      #skip <- FALSE
       if( k == 1 ) {
         ar <- data[[1]]$ar  
         value <- data[[1]]$plaq
@@ -76,43 +76,38 @@ plotfunc <- function(sample) {
         postname <- "mean"
       }
 
-      # do not attempt to plot rectangle expectation values for samples
-      # which do not contain rectangle gauge terms
-      if( k == 2 && sample %in% norectsamples ) {  
-        skip = TRUE
-      }
-    
       # plot the expectation value, skip if this sample does not contain
-      # does not contain the particular value (e.g. rectangle in the test above)
-      if( !skip ) {
+      # the particular value (the data collection function would have set it
+      # to NA
+      if(!( NA %in% value)) {
         par(mar=c(6.1,6.1,4.1,1.0))
 
         title <- paste(sample,paste(name,postname))
         title <- paste(title,"\n")
         title <- paste(title,topdirname)
-
         plotwitherror(x = c(1:length(value)), xlim=c(1,(length(value)+1)),
           y = value, dy=dvalue, 
           main=title, 
           xlab="",ylab=name,xaxt="n",pch=16)
-      
-        axis(1,labels=FALSE,tick=FALSE)
-
+        
         plotwitherror(add=TRUE, x = length(value)+1, xlim=c(1,(length(value)+1)),
           y = ref, dy=dref, 
           col="dark red",pch=16,xaxt="n")
-        
+     
+        axis(1,labels=FALSE,tick=TRUE,tck=-0.007,at=c(1:(length(value)+1)))
+
         # add a vertical grid to make identifying runs easier 
         abline(v=(seq(1,(length(value)+1),1)), col="lightgray",lty="dashed")
 
         # display median value of the quantity
         points(c(1:length(valuemed)),valuemed) 
 
-        # print names of data sets
+        # print short names of data sets (also called "addons" elsewhere)
         text(c(1:(length(value)+1)),par("usr")[3], labels = shortlabels, 
           srt = 30, adj = c(1.1,1.1), xpd = TRUE, cex=.9)
 
-
+        # for the plaquette and rectangle we would like to display 
+        # the acceptance rate and autocorrelation time on the plot
         if( k %in% c(1,2) ) {
           # display autocorrelation times on the plot
           rounded <- round(tauint,digits=5)
@@ -152,6 +147,9 @@ plotfunc <- function(sample) {
 
     text(x=seq(1,50*number,50),par("usr")[3], labels = shortlabels[1:number], 
       srt = 30, adj = c(1.1,1.1), xpd = TRUE, cex=.9)
+
+    axis(1,labels=FALSE,tick=TRUE,tck=-0.007,at=(seq(1,50*length(value),50)))
+
     # close the expvals file for the current sample
     dev.off();
 
@@ -160,22 +158,22 @@ plotfunc <- function(sample) {
     for( j in 1:number ) {
       title <- paste(labels[j],"plaquette history\n")
       title <- paste(title,topdirname)
-      plot(data[[2*j]],x=c(1:length(data[[2*j]])),type="l",lty=1,main=title,xlab="trajectory",ylab="plaquette")
+      plot(data[[2*j]],x=c(1:length(data[[2*j]])),type="p",pch=".",main=title,xlab="trajectory",ylab="plaquette")
     }
     dev.off();
 
     skip <- FALSE
-    for( j in c(1:length(norectsamples)) ) {
-      if( sample == norectsamples[j] ) {
-        skip = TRUE
-      }
+    if( sample %in% norectsamples ) {
+      skip = TRUE
     }
     
     if( !skip ) {
       # plot rectangle histories if this sample has a rectangle gauge part
       pdf(onefile=TRUE,file=paste(subdir,paste(sample,"rec_history.pdf",sep="_"),sep="/"),width=8,height=8)
       for( j in 1:number ) {
-        plot(data[[2*j+1]],x=c(1:length(data[[2*j+1]])),type="l",lty=1,main=paste(labels[j],"rectangle history"),xlab="trajectory",ylab="rectangle")
+        title <- paste(labels[j],"rectangle history\n")
+        title <- paste(title,topdirname)
+        plot(data[[2*j+1]],x=c(1:length(data[[2*j+1]])),type="p",pch=".",main=title,xlab="trajectory",ylab="rectangle")
       }
       dev.off();
     }

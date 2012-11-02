@@ -8,7 +8,7 @@
 
 library(hadron)
 
-readoutput <- function(filename,norect,format,ndclover) {
+readoutput <- function(filename,norect,format,ndclover,nocg) {
 
   data <- read.table(filename)
  
@@ -39,9 +39,16 @@ readoutput <- function(filename,norect,format,ndclover) {
   dtrajtimet <- sd(data[min:max,trajtimecol])
   trajtimemedt <- median(data[min:max,trajtimecol])
 
-  cgitnumt <- mean(data[min:max,cgitnumcol])
-  dcgitnumt <- sd(data[min:max,cgitnumcol])
-  cgitnummedt <- median(data[min:max,cgitnumcol])
+  # if the sample has no CG we skip that
+  if( nocg ) {
+    cgitnumt <- NA
+    dcgitnumt <- NA
+    cgitnummedt <- NA
+  } else {
+    cgitnumt <- mean(data[min:max,cgitnumcol])
+    dcgitnumt <- sd(data[min:max,cgitnumcol])
+    cgitnummedt <- median(data[min:max,cgitnumcol])
+  }
 
   plaq <- data[min:max,pcol]
   plaqres <- uwerrprimary(plaq)
