@@ -28,11 +28,10 @@ readoutput <- function(filename,norect,format,ndclover,nocg) {
     trajtimecol <- length(data)-1
   }
 
-  if( length(data[,pcol]) < 11000 ) {
+  if( length(data[,pcol]) < min+minlength ) {
     return(NA)
   }
 
-  min <- 5000
   max <- length(data[,pcol])
 
   trajtimet <- mean(data[min:max,trajtimecol])

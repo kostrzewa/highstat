@@ -64,7 +64,7 @@ collect_data <- function(dirs) {
     ofile <- paste(dirs[i],"/output.data",sep="")
     stdout <- list.files(dirs[i],pattern="stdout*",full.names=TRUE)
     
-    if( file.exists(ofile) && ( as.integer( strsplit( system(paste("wc -l",ofile),intern=TRUE), " ")[[1]][[1]] ) > 11000 ) ) {
+    if( file.exists(ofile) && ( as.integer( strsplit( system(paste("wc -l",ofile),intern=TRUE), " ")[[1]][[1]] ) > min+minlength ) ) {
       
       if( length(stdout) > 0 && file.exists(stdout) ) {
         grepcommand <- paste("grep 'Acceptance rate'",stdout)
@@ -87,7 +87,7 @@ collect_data <- function(dirs) {
       if( !norect ) {
         trec <- tres$rec$value
         tdrec <- tres$rec$dvalue
-        trecmed <- median(tres$rec$data[10000:length(tres$rec$data)])
+        trecmed <- median(tres$rec$data[min:length(tres$rec$data)])
         trectauint <- tres$rec$tauint
         trecdtauint <- tres$rec$dtauint
         trechist <- tres$rechist
@@ -102,7 +102,7 @@ collect_data <- function(dirs) {
         list(ar=tar,
           trajtime=tres$trajtime,dtrajtime=tres$dtrajtime,trajtimemed=tres$trajtimemed,
           cgitnum=tres$cgitnum,dcgitnum=tres$dcgitnum,cgitnummed=tres$cgitnummed,
-          plaq=tres$pl$value,dplaq=tres$pl$dvalue,plaqmed=median(tres$pl$data[10000:length(tres$pl$data)]),
+          plaq=tres$pl$value,dplaq=tres$pl$dvalue,plaqmed=median(tres$pl$data[min:length(tres$pl$data)]),
           plaqtauint=tres$pl$tauint,plaqdtauint=tres$pl$dtauint,
           rec=trec,drec=tdrec,recmed=trecmed,rectauint=trectauint,recdtauint=trecdtauint))
 
@@ -113,8 +113,8 @@ collect_data <- function(dirs) {
     } else if ( ! file.exists(ofile) )  {
       print(paste(ofile,"does not exist! Skipping."))
       skip <- skip+1
-    } else if ( as.integer( strsplit( system(paste("wc -l",ofile),intern=TRUE), " ")[[1]][[1]] ) < 11000 ) {
-      print(paste(ofile,"has less than 11000 lines! Skipping."))
+    } else if ( as.integer( strsplit( system(paste("wc -l",ofile),intern=TRUE), " ")[[1]][[1]] ) < min+minlength ) {
+      print(paste(paste(ofile,"has less than"),paste(min+minlength,"lines! Skipping.")))
       skip <- skip+1
     }
   }

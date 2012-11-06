@@ -54,13 +54,16 @@ source("plotfunc.R")
 
 # we use global variables to enable parallelization
 
-samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_tmcloverdetratio","hmc_cloverdet","hmc_tmcloverdet","hmc_ndclover","hmc_nocsw_ndclover","hmc_nosplit_ndclover","hmc_nosplit_nocsw_ndclover","hmc_check_ndclover_tmcloverdet","hmc_check_ndclover_nocsw_tmcloverdet")
+samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_ndclover","hmc_nosplit_ndclover","hmc_nocsw_ndclover","hmc_nosplit_nocsw_ndclover","hmc_cloverdet","hmc_tmcloverdet","hmc_check_ndclover_tmcloverdet", "hmc_check_ndclover_nocsw_tmcloverdet","hmc_tmcloverdetratio")
 
 # these samples do not contain a rectangular gauge part
 norectsamples <- c("hmc0","hmc1","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
  
 # these are reference values for the plaquette and rectangle expectation value 
 reference <- read.table("reference.dat", fill=TRUE)
+
+min <- 100
+minlength <- 500
 
 topdir
 topdirname 
@@ -81,6 +84,15 @@ highstat <- function(tdir) {
  
   # process samples in parallel, spawning 8 processes
   # change to lapply in case of errors! 
-  mclapply( samples, FUN=plotfunc , mc.cores = 8 )
+  timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 )
+  
+  
+  # collect timing information in a table
+  timetable <- timelist[[1]]
+  for (i in seq(2,length(timelist))) {
+    timetable <- rbind(timetable,timelist[[i]])
+  }
+  timetable <- aperm(timetable, perm = NULL, resize = TRUE, keep.class = TRUE)
+  write.table(timetable,file=paste(subdir,"runtimes.csv",sep="/"),quote=FALSE) 
 }
  

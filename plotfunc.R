@@ -63,6 +63,12 @@ plotfunc <- function(sample) {
         dref <- NA
         name <- "trajectory time"
         postname <- "mean"
+        # output the trajectory time to use as a timebase
+        # note: 1.2 * 1000 * trajtime / 3600 (1.2 * hours for 1000 trajectories) 
+        reftime <- matrix(value/3,ncol=length(value),byrow=TRUE)
+        colnames(reftime) <- shortlabels[1:length(shortlabels)-1]
+        rownames(reftime) <- sample
+        reftime <- as.table(reftime)
       } else if ( k == 4 ) {
         ar <- NA
         value <- data[[1]]$cgitnum
@@ -178,4 +184,5 @@ plotfunc <- function(sample) {
       dev.off();
     }
   }
+  return(reftime)
 }
