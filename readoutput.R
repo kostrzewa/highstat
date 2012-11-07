@@ -8,7 +8,7 @@
 
 library(hadron)
 
-readoutput <- function(filename,norect,format,ndclover,nocg) {
+readoutput <- function(filename,norect,format,brokenndclover,nocg) {
 
   data <- read.table(filename)
  
@@ -16,7 +16,7 @@ readoutput <- function(filename,norect,format,ndclover,nocg) {
   reccol <- length(data)
 
   # temporary workaround for broken output.data due to CLOVERNDTRLOG
-  if( ndclover ) {
+  if( brokenndclover ) {
     cgitnumcol <- format+5+2
   } else {
     cgitnumcol <- format+5

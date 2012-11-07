@@ -46,18 +46,18 @@ collect_data <- function(dirs) {
       format <- 1
     }
 
-    # workaround for temporarily broken output.data due to CLOVERNDTRLOG
+    #workaround for temporarily broken output.data due to CLOVERNDTRLOG
     #if( length( grep(name,pattern="ndclover") ) > 0 && length( grep(name,pattern="check_ndclover") ) == 0 ) {
-    #  ndclover <- TRUE
+    #  brokenndclover <- TRUE
     #} else {
-    #  ndclover <- FALSE
+    #  brokenndclover <- FALSE
     #}
 
-    ndclover <- FALSE
+    brokenndclover <- FALSE
 
     # some samples do not have a CG in the HMC so we don't need to plot this
     if( length( grep(name,pattern="nosplit_ndclover") ) > 0 || 
-        length( grep(name,pattern="nosplit_nocsw_ndclover") ) ) {
+        length( grep(name,pattern="nosplit_nocsw_ndclover") ) > 0 ) {
       nocg <- TRUE
     } else {
       nocg <- FALSE
@@ -76,7 +76,7 @@ collect_data <- function(dirs) {
         tar <- NA
       }
 
-      tres <- readoutput(ofile,norect,format,ndclover,nocg)
+      tres <- readoutput(ofile,norect,format,brokenndclover,nocg)
                 
       trec <- NA
       tdrec <- NA

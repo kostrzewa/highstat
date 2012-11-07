@@ -71,8 +71,8 @@ norectsamples <- c("hmc0","hmc1","hmc_cloverdet","hmc_tmcloverdet","hmc_tmclover
 # these are reference values for the plaquette and rectangle expectation value 
 reference <- read.table("reference.dat", fill=TRUE)
 
-min <- 1000
-minlength <- 1000
+min <- 100
+minlength <- 800
 
 topdir
 topdirname 
@@ -93,8 +93,8 @@ highstat <- function(tdir) {
  
   # process samples in parallel, spawning 8 processes
   # change to lapply in case of errors! 
-  # timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 ,mc.preschedule=FALSE)
-  timelist <- lapply( samples, FUN=plotfunc )
+  timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 ,mc.preschedule=FALSE)
+  # timelist <- lapply( samples, FUN=plotfunc )
   
   # collect timing information in a table
   for (i in seq(1,length(timelist))) {
