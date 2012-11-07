@@ -10,7 +10,6 @@ plotfunc <- function(samp) {
 
   if( length(dirs) == 0 ) {
     print("No data found for this sample file. Skipping!")
-    reftime <- NA
     skipall <- TRUE
   } else {
     data <- collect_data(dirs)
@@ -20,9 +19,12 @@ plotfunc <- function(samp) {
   # either none of them existed or none had a sufficient number of lines
   if( !skipall && length(data) < 2 ) {
     skipall <- TRUE
-    reftime <- NA
   }
 
+  reftime <- matrix( rep(NA,length(execs)), ncol=length(execs), byrow=TRUE )
+  colnames(reftime) <- execs
+  rownames(reftime) <- samp
+  
   if( !skipall ) {
     pdf(onefile=TRUE,file=paste(subdir,paste(samp,"expvals.pdf",sep="_"),sep="/"),width=8,height=8)
 
@@ -73,10 +75,14 @@ plotfunc <- function(samp) {
         postname <- "mean"
         # output the trajectory time to use as a timebase
         # note: 1.2 * 1000 * trajtime / 3600 (1.2 * hours for 1000 trajectories) 
-        reftime <- matrix(value/3,ncol=length(value),byrow=TRUE)
-        colnames(reftime) <- shortlabels[1:length(shortlabels)-1]
+        lreftime <- matrix(value/3,ncol=length(value),byrow=TRUE)
+        colnames(lreftime) <- shortlabels[1:length(shortlabels)-1]
+        rownames(lreftime) <- samp
+       
+        # merge the table full of NA with the table of actual measurements 
+        reftime <- merge(lreftime,reftime,all.x=TRUE,all.y=FALSE,by=intersect(colnames(reftime),colnames(lreftime)))#,all=TRUE,incomparables=NULL)
         rownames(reftime) <- samp
-        reftime <- as.table(reftime)
+         
       } else if ( k == 4 ) {
         ar <- NA
         value <- data[[1]]$cgitnum

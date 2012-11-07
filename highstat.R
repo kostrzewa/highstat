@@ -57,6 +57,10 @@ source("plotfunc.R")
 
 samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_ndclover","hmc_nosplit_ndclover","hmc_nocsw_ndclover","hmc_nosplit_nocsw_ndclover","hmc_cloverdet","hmc_tmcloverdet","hmc_check_ndclover_tmcloverdet", "hmc_check_ndclover_nocsw_tmcloverdet","hmc_tmcloverdetratio")
 
+execs <- c("mpi","mpi_hs","openmp","openmp_hs","serial","serial_hs","4D_MPI_hs","4D_MPI","hybrid","hybrid_hs","5.1.6_mpi","5.1.6_serial")
+#execs <- c("mpi_hs","openmp","serial","hybrid_hs","4D_MPI_hs")
+
+
 # for debugging purposes, we can shuffle the vector
 # samples <- sample(samples,size=length(samples))
 
@@ -89,17 +93,21 @@ highstat <- function(tdir) {
  
   # process samples in parallel, spawning 8 processes
   # change to lapply in case of errors! 
-  timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 ,mc.preschedule=FALSE)
-
+  # timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 ,mc.preschedule=FALSE)
+  timelist <- lapply( samples, FUN=plotfunc )
+  
   # collect timing information in a table
   for (i in seq(1,length(timelist))) {
-    if( i == 1 && !is.na(timelist[[i]]) ) {
+    #print( timelist[[i]] )
+    if( i==1 ) {
       timetable <- timelist[[i]]
-    } else if( !is.na(timelist[[i]]) ) {
+    } else {
       timetable <- rbind(timetable,timelist[[i]])
     }
   }
-  timetable <- aperm(timetable, perm = NULL, resize = TRUE, keep.class = TRUE)
+
+  # transpose to get correct format for genjobscripts.sh
+  timetable <- t(timetable)
   write.table(timetable,file=paste(subdir,"runtimes.csv",sep="/"),quote=FALSE,row.names=TRUE,col.names=NA) 
 }
  
