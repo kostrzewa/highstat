@@ -1,8 +1,8 @@
 source("collect_data.R")
 
-plotfunc <- function(sample) {
-  pdf(onefile=TRUE,file=paste(subdir,paste(sample,"expvals.pdf",sep="_"),sep="/"),width=8,height=8)
-  pat <- paste(paste("^",sample,sep=""),"_",sep="")
+plotfunc <- function(samp) {
+  pdf(onefile=TRUE,file=paste(subdir,paste(samp,"expvals.pdf",sep="_"),sep="/"),width=8,height=8)
+  pat <- paste(paste("^",samp,sep=""),"_",sep="")
 
   # find the subdirectories which refer to the current sample
   dirs <- list.files(topdir,pattern=pat,full.names=TRUE)
@@ -23,7 +23,7 @@ plotfunc <- function(sample) {
     labels <- append(labels,"reference")
 
     # extract the "addon" from the labels (ie. serial, mpi_hs etc..)
-    shortlabels <- extract_addons(labels,sample)
+    shortlabels <- extract_addons(labels,samp)
 
     # we use the same plotting function for the plaquette and rectangle so
     # we collect the values in temporary variables so we have to write the 
@@ -37,8 +37,8 @@ plotfunc <- function(sample) {
         valuemed <- data[[1]]$plaqmed
         tauint <- data[[1]]$plaqtauint
         dtauint <- data[[1]]$plaqdtauint
-        ref <- reference[sample,]$plaq
-        dref <- reference[sample,]$dplaq
+        ref <- reference[samp,]$plaq
+        dref <- reference[samp,]$dplaq
         name <- "plaquette"
         postname <- "exp. value"
       } else if ( k == 2 ) {
@@ -48,8 +48,8 @@ plotfunc <- function(sample) {
         valuemed <- data[[1]]$recmed
         tauint <- data[[1]]$rectauint
         dtauint <- data[[1]]$recdtauint
-        ref <- reference[sample,]$rec
-        dref <- reference[sample,]$drec
+        ref <- reference[samp,]$rec
+        dref <- reference[samp,]$drec
         name <- "rectangle"
         postname <- "exp. value"
       } else if ( k == 3 ) {
@@ -67,7 +67,7 @@ plotfunc <- function(sample) {
         # note: 1.2 * 1000 * trajtime / 3600 (1.2 * hours for 1000 trajectories) 
         reftime <- matrix(value/3,ncol=length(value),byrow=TRUE)
         colnames(reftime) <- shortlabels[1:length(shortlabels)-1]
-        rownames(reftime) <- sample
+        rownames(reftime) <- samp
         reftime <- as.table(reftime)
       } else if ( k == 4 ) {
         ar <- NA
@@ -88,7 +88,7 @@ plotfunc <- function(sample) {
       if(!( NA %in% value)) {
         par(mar=c(6.1,6.1,4.1,1.0))
 
-        title <- paste(sample,paste(name,postname))
+        title <- paste(samp,paste(name,postname))
         title <- paste(title,"\n")
         title <- paste(title,topdirname)
         plotwitherror(x = c(1:length(value)), xlim=c(1,(length(value)+1)),
@@ -139,7 +139,7 @@ plotfunc <- function(sample) {
     # the total number of histories for this sample is thus:
     number <- ((length(data)-1)/2)
 
-    title <- paste(sample,"initial plaquette history\n")
+    title <- paste(samp,"initial plaquette history\n")
     title <- paste(title,topdirname)
 
     # plot initial plaquette histories now
@@ -160,7 +160,7 @@ plotfunc <- function(sample) {
     dev.off();
 
     # plot full plaquette histories in a separate file
-    pdf(onefile=TRUE,file=paste(subdir,paste(sample,"pl_history.pdf",sep="_"),sep="/"),width=8,height=8)
+    pdf(onefile=TRUE,file=paste(subdir,paste(samp,"pl_history.pdf",sep="_"),sep="/"),width=8,height=8)
     for( j in 1:number ) {
       title <- paste(labels[j],"plaquette history\n")
       title <- paste(title,topdirname)
@@ -169,13 +169,13 @@ plotfunc <- function(sample) {
     dev.off();
 
     skip <- FALSE
-    if( sample %in% norectsamples ) {
+    if( samp %in% norectsamples ) {
       skip = TRUE
     }
     
     if( !skip ) {
       # plot rectangle histories if this sample has a rectangle gauge part
-      pdf(onefile=TRUE,file=paste(subdir,paste(sample,"rec_history.pdf",sep="_"),sep="/"),width=8,height=8)
+      pdf(onefile=TRUE,file=paste(subdir,paste(samp,"rec_history.pdf",sep="_"),sep="/"),width=8,height=8)
       for( j in 1:number ) {
         title <- paste(labels[j],"rectangle history\n")
         title <- paste(title,topdirname)
