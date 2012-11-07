@@ -54,6 +54,8 @@ source("plotfunc.R")
 
 # we use global variables to enable parallelization
 
+
+# the samples vector must be in the same order as in genjobscripts for the reference values produced from here to be usable
 samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_ndclover","hmc_nosplit_ndclover","hmc_nocsw_ndclover","hmc_nosplit_nocsw_ndclover","hmc_cloverdet","hmc_tmcloverdet","hmc_check_ndclover_tmcloverdet", "hmc_check_ndclover_nocsw_tmcloverdet","hmc_tmcloverdetratio")
 
 # these samples do not contain a rectangular gauge part
@@ -93,6 +95,6 @@ highstat <- function(tdir) {
     timetable <- rbind(timetable,timelist[[i]])
   }
   timetable <- aperm(timetable, perm = NULL, resize = TRUE, keep.class = TRUE)
-  write.table(timetable,file=paste(subdir,"runtimes.csv",sep="/"),quote=FALSE) 
+  write.table(timetable,file=paste(subdir,"runtimes.csv",sep="/"),quote=FALSE,row.names=TRUE,col.names=NA) 
 }
  
