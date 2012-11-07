@@ -1,22 +1,30 @@
 source("collect_data.R")
 
 plotfunc <- function(samp) {
-  pdf(onefile=TRUE,file=paste(subdir,paste(samp,"expvals.pdf",sep="_"),sep="/"),width=8,height=8)
   pat <- paste(paste("^",samp,sep=""),"_",sep="")
 
   # find the subdirectories which refer to the current sample
   dirs <- list.files(topdir,pattern=pat,full.names=TRUE)
 
-  data <- collect_data(dirs)
+  skipall <- FALSE
+
+  if( length(dirs) == 0 ) {
+    print("No data found for this sample file. Skipping!")
+    reftime <- NA
+    skipall <- TRUE
+  } else {
+    data <- collect_data(dirs)
+  }
 
   # when the length of data is 1, none of the output.data in this sample was suitable 
   # either none of them existed or none had a sufficient number of lines
-  skipall <- FALSE
-  if( length(data) < 2 ) {
+  if( !skipall && length(data) < 2 ) {
     skipall <- TRUE
+    reftime <- NA
   }
 
   if( !skipall ) {
+    pdf(onefile=TRUE,file=paste(subdir,paste(samp,"expvals.pdf",sep="_"),sep="/"),width=8,height=8)
 
     # extract the names of the subdirectories for this sample set
     labels <- row.names(data[[1]])

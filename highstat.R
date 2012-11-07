@@ -90,11 +90,14 @@ highstat <- function(tdir) {
   # process samples in parallel, spawning 8 processes
   # change to lapply in case of errors! 
   timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 ,mc.preschedule=FALSE)
- 
+
   # collect timing information in a table
-  timetable <- timelist[[1]]
-  for (i in seq(2,length(timelist))) {
-    timetable <- rbind(timetable,timelist[[i]])
+  for (i in seq(1,length(timelist))) {
+    if( i == 1 && !is.na(timelist[[i]]) ) {
+      timetable <- timelist[[i]]
+    } else if( !is.na(timelist[[i]]) ) {
+      timetable <- rbind(timetable,timelist[[i]])
+    }
   }
   timetable <- aperm(timetable, perm = NULL, resize = TRUE, keep.class = TRUE)
   write.table(timetable,file=paste(subdir,"runtimes.csv",sep="/"),quote=FALSE,row.names=TRUE,col.names=NA) 

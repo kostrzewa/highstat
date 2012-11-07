@@ -47,11 +47,13 @@ collect_data <- function(dirs) {
     }
 
     # workaround for temporarily broken output.data due to CLOVERNDTRLOG
-    if( length( grep(name,pattern="ndclover") ) > 0 && length( grep(name,pattern="check_ndclover") ) == 0 ) {
-      ndclover <- TRUE
-    } else {
-      ndclover <- FALSE
-    }
+    #if( length( grep(name,pattern="ndclover") ) > 0 && length( grep(name,pattern="check_ndclover") ) == 0 ) {
+    #  ndclover <- TRUE
+    #} else {
+    #  ndclover <- FALSE
+    #}
+
+    ndclover <- FALSE
 
     # some samples do not have a CG in the HMC so we don't need to plot this
     if( length( grep(name,pattern="nosplit_ndclover") ) > 0 || 
