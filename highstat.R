@@ -55,7 +55,6 @@ source("plotfunc.R")
 # we use global variables to enable parallelization
 
 
-# the samples vector must be in the same order as in genjobscripts for the reference values produced from here to be usable
 samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_ndclover","hmc_nosplit_ndclover","hmc_nocsw_ndclover","hmc_nosplit_nocsw_ndclover","hmc_cloverdet","hmc_tmcloverdet","hmc_check_ndclover_tmcloverdet", "hmc_check_ndclover_nocsw_tmcloverdet","hmc_tmcloverdetratio")
 
 # these samples do not contain a rectangular gauge part
@@ -86,9 +85,8 @@ highstat <- function(tdir) {
  
   # process samples in parallel, spawning 8 processes
   # change to lapply in case of errors! 
-  timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 )
-  
-  
+  timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 ,mc.preschedule=FALSE)
+ 
   # collect timing information in a table
   timetable <- timelist[[1]]
   for (i in seq(2,length(timelist))) {
