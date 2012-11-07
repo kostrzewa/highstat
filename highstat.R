@@ -57,14 +57,18 @@ source("plotfunc.R")
 
 samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_ndclover","hmc_nosplit_ndclover","hmc_nocsw_ndclover","hmc_nosplit_nocsw_ndclover","hmc_cloverdet","hmc_tmcloverdet","hmc_check_ndclover_tmcloverdet", "hmc_check_ndclover_nocsw_tmcloverdet","hmc_tmcloverdetratio")
 
+# for debugging purposes, we can shuffle the vector
+# samples <- sample(samples,size=length(samples))
+
+
 # these samples do not contain a rectangular gauge part
 norectsamples <- c("hmc0","hmc1","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
  
 # these are reference values for the plaquette and rectangle expectation value 
 reference <- read.table("reference.dat", fill=TRUE)
 
-min <- 100
-minlength <- 500
+min <- 1000
+minlength <- 1000
 
 topdir
 topdirname 
