@@ -9,7 +9,7 @@ plotfunc <- function(samp) {
   skipall <- FALSE
 
   if( length(dirs) == 0 ) {
-    print("No data found for this sample file. Skipping!")
+    print(sprintf("No data found for this sample file. Skipping %s!",samp))
     skipall <- TRUE
   } else {
     data <- collect_data(dirs)
@@ -28,18 +28,11 @@ plotfunc <- function(samp) {
   if( !skipall ) {
     pdf(onefile=TRUE,file=paste(subdir,paste(samp,"expvals.pdf",sep="_"),sep="/"),width=8,height=8)
 
-    # extract the names of the subdirectories for this sample set
-    labels <- row.names(data[[1]])
-    labels <- append(labels,"reference")
-
-    # extract the "addon" from the labels (ie. serial, mpi_hs etc..)
-    shortlabels <- extract_addons(labels,samp)
-
-    # we use the same plotting function for the plaquette and rectangle so
+    # we use the same plotting function for all observables
     # we collect the values in temporary variables so we have to write the 
     # plotting routine only once
     for( k in c(1:4) ) {
-      #skip <- FALSE
+      hasref <- FALSE
       if( k == 1 ) {
         ar <- data[[1]]$ar  
         value <- data[[1]]$plaq
@@ -51,6 +44,7 @@ plotfunc <- function(samp) {
         dref <- reference[samp,]$dplaq
         name <- "plaquette"
         postname <- "exp. value"
+        hasref <- TRUE
       } else if ( k == 2 ) {
         ar <- data[[1]]$ar
         value <- data[[1]]$rec
@@ -62,6 +56,7 @@ plotfunc <- function(samp) {
         dref <- reference[samp,]$drec
         name <- "rectangle"
         postname <- "exp. value"
+        hasref <- TRUE
       } else if ( k == 3 ) {
         ar <- NA
         value <- data[[1]]$trajtime
@@ -73,14 +68,20 @@ plotfunc <- function(samp) {
         dref <- NA
         name <- "trajectory time"
         postname <- "mean"
+        hasref <- FALSE
+
+        # we write runtimes.csv so we know how long a run takes
         # output the trajectory time to use as a timebase
+        # multiply by 1.2 as a fudge factor because the zeuthen cluster has
+        # unpredictable performance! 
         # note: 1.2 * 1000 * trajtime / 3600 (1.2 * hours for 1000 trajectories) 
         lreftime <- matrix(value/3,ncol=length(value),byrow=TRUE)
         colnames(lreftime) <- shortlabels[1:length(shortlabels)-1]
         rownames(lreftime) <- samp
        
-        # merge the table full of NA with the table of actual measurements 
-        reftime <- merge(lreftime,reftime,all.x=TRUE,all.y=FALSE,by=intersect(colnames(reftime),colnames(lreftime)))#,all=TRUE,incomparables=NULL)
+        # merge the table full of NA with the table of actual measurements
+        # when completed, this will become runtimes.csv
+        reftime <- merge(lreftime,reftime,all.x=TRUE,all.y=FALSE,by=intersect(colnames(reftime),colnames(lreftime)))
         rownames(reftime) <- samp
          
       } else if ( k == 4 ) {
@@ -94,25 +95,51 @@ plotfunc <- function(samp) {
         dref <- NA
         name <- "CG iterations"
         postname <- "mean"
+        hasref <- TRUE
       }
+
+      # extract the names of the subdirectories for this sample set
+      # these will become the tick labels on the plot after shortening
+      labels <- row.names(data[[1]])  
+      if(hasref) {
+        labels <- append(labels,"reference")
+      }
+      # extract the "addon" from the labels (ie. serial, mpi_hs etc..)
+      # these will be the ticklabels on the plot
+      shortlabels <- extract_addons(labels,samp)
+
 
       # plot the expectation value, skip if this sample does not contain
       # the particular value (the data collection function would have set it
-      # to NA
+      # to NA in this case )
       if(!( NA %in% value)) {
         par(mar=c(6.1,6.1,4.1,1.0))
 
         title <- paste(samp,paste(name,postname))
         title <- paste(title,"\n")
         title <- paste(title,topdirname)
-        plotwitherror(x = c(1:length(value)), xlim=c(1,(length(value)+1)),
-          y = value, dy=dvalue, 
-          main=title, 
-          xlab="",ylab=name,xaxt="n",pch=16)
-        
-        plotwitherror(add=TRUE, x = length(value)+1, xlim=c(1,(length(value)+1)),
-          y = ref, dy=dref, 
-          col="dark red",pch=16,xaxt="n")
+
+        miny <- min(value)-0.22*(max(value)-min(value))
+        if( miny > min(value)-max(dvalue) ) {
+          miny <- min(value)-1.1*max(dvalue)
+        }
+
+        maxy <- max(value)+max(dvalue)
+
+        if( hasref ) {
+          plotwitherror(x = c(1:length(value)), xlim=c(1,(length(value)+1)),
+            y = value, dy=dvalue, ylim=c(miny,maxy), 
+            main=title, 
+            xlab="",ylab=name,xaxt="n",pch=16) 
+          plotwitherror(add=TRUE, x = length(value)+1, xlim=c(1,(length(value)+1)),
+            y = ref, dy=dref, 
+            col="dark red",pch=16,xaxt="n")
+        } else {
+         plotwitherror(x = c(1:length(value)), xlim=c(1,length(value)),
+            y = value, dy=dvalue, ylim=c(miny,maxy), 
+            main=title, 
+            xlab="",ylab=name,xaxt="n",pch=16) 
+        }
      
         axis(1,labels=FALSE,tick=TRUE,tck=-0.007,at=c(1:(length(value)+1)))
 
@@ -123,7 +150,9 @@ plotfunc <- function(samp) {
         points(c(1:length(valuemed)),valuemed) 
 
         # print short names of data sets (also called "addons" elsewhere)
-        text(c(1:(length(value)+1)),par("usr")[3], labels = shortlabels, 
+        # if there is no reference, do not print the final label which is "reference"
+        # these are at the locations of the tick labels and rotated for legibility
+        text(c(1:(length(shortlabels))),par("usr")[3], labels = shortlabels, 
           srt = 30, adj = c(1.1,1.1), xpd = TRUE, cex=.9)
 
         # for the plaquette and rectangle we would like to display 
@@ -141,7 +170,7 @@ plotfunc <- function(samp) {
           for( j in 1:length(value) ) {
             ARlabel <- bquote(AR == .(ar[j]) )
             text(x=j,y=par("usr")[3],labels=ARlabel,srt=50,
-              adj = c(-0.3,-2.0), xpd = TRUE, cex = .9)
+              adj = c(-0.3,-1.6), xpd = TRUE, cex = .9)
           }
         }
       }
