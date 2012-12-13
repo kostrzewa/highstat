@@ -1,3 +1,21 @@
+# This file is part of the "highstat" R script set
+# Copyright (C) 2012  Bartosz Kostrzewa
+
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
 # given output.data of a high statistics run, plaqrect produces expectation
 # values and errors based on uwerrprimary
 # norect (boolean) signifies that this output.data does not have a column for the
@@ -32,7 +50,12 @@ readoutput <- function(filename,norect,format,brokenndclover,nocg) {
     return(NA)
   }
 
-  max <- length(data[,pcol])
+  # the limit and trajs parameters are defined in highstat.R
+  if( limit && length(data[,pcol]) > min+trajs ) {
+    max <- min+trajs
+  } else {
+    max <- length(data[,pcol])
+  }
 
   trajtimet <- mean(data[min:max,trajtimecol])
   dtrajtimet <- sd(data[min:max,trajtimecol])

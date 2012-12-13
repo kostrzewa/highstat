@@ -1,3 +1,21 @@
+# This file is part of the "highstat" R script set
+# Copyright (C) 2012  Bartosz Kostrzewa
+
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
 # highstat is a function which uses Carsten Urbach's hadron library
 # to compute expectation values of the plaquette and the rectangle
 # for the set of sample files of the tmLQCD software package
@@ -54,11 +72,19 @@ source("plotfunc.R")
 
 # we use global variables to enable parallelization
 
+samples <- c("mpihmc1","mpihmc2","mpihmc3","mpihmc4","mpihmc5","mpihmc6","mpihmc7","mpihmc8","mpihmc211",
+  "hmc0","hmc_repro_0","hmc1","hmc_repro_1","hmc2","hmc_repro_2","hmc3",
+  "hmc_ndclover","hmc_nosplit_ndclover","hmc_nocsw_ndclover","hmc_nosplit_nocsw_ndclover",
+  "hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio",
+  "hmc_check_ndclover_tmcloverdet", "hmc_check_ndclover_nocsw_tmcloverdet")
 
-samples <- c("hmc0","hmc1","hmc2","hmc3","hmc_ndclover","hmc_nosplit_ndclover","hmc_nocsw_ndclover","hmc_nosplit_nocsw_ndclover","hmc_cloverdet","hmc_tmcloverdet","hmc_check_ndclover_tmcloverdet", "hmc_check_ndclover_nocsw_tmcloverdet","hmc_tmcloverdetratio")
-
-execs <- c("mpi","mpi_hs","openmp","openmp_hs","serial","serial_hs","4D_MPI_hs","4D_MPI","hybrid","hybrid_hs","5.1.6_mpi","5.1.6_serial")
-#execs <- c("mpi_hs","openmp","serial","hybrid_hs","4D_MPI_hs")
+execs <- c("openmp","openmp_hs","serial","serial_hs",
+  "1D_hybrid_hs_2",
+  "BGQ_4D_SPI_hybrid_hs_32","BGQ_4D_SPI_hybrid_hs_128",
+  "4D_MPI_hs_16","4D_MPI_hs_32","4D_MPI_hs_64","4D_MPI_hs_128","4D_MPI_hs_256",
+  "3D_MPI_hs_8","3D_MPI_hs_16","3D_MPI_hs_24","3D_MPI_hs_32","3D_MPI_hs_64",
+  "2D_MPI_hs_16","1D_MPI_hs_16",
+  "5.1.6_3D_MPI_hs_8","5.1.6_serial")
 
 
 # for debugging purposes, we can shuffle the vector
@@ -66,13 +92,20 @@ execs <- c("mpi","mpi_hs","openmp","openmp_hs","serial","serial_hs","4D_MPI_hs",
 
 
 # these samples do not contain a rectangular gauge part
-norectsamples <- c("hmc0","hmc1","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
+norectsamples <- c("mpihmc2","mpihmc4","mpihmc6","mpihmc8",
+  "hmc0","hmc_repro_0","hmc1","hmc_repro_1",
+  "hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
  
 # these are reference values for the plaquette and rectangle expectation value 
-reference <- read.table("reference.dat", fill=TRUE)
+reference <- read.table("reference.dat", fill=FALSE,sep=" ", header=TRUE, row.names=1)
 
-min <- 100
-minlength <- 800
+min <- 1500
+minlength <- 1000
+
+# the limit parameter specifies whether the trajectory series should be cut
+# the trajs parameter specifies where it will be cut ( min + trajs )
+limit <- FALSE
+trajs <- 6000
 
 topdir
 topdirname 
@@ -93,12 +126,12 @@ highstat <- function(tdir) {
  
   # process samples in parallel, spawning 8 processes
   # change to lapply in case of errors! 
+  # also makes debugging easier in case of errors not related to multicore
   timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 ,mc.preschedule=FALSE)
-  # timelist <- lapply( samples, FUN=plotfunc )
-  
+  #timelist <- lapply( samples, FUN=plotfunc )
+
   # collect timing information in a table
   for (i in seq(1,length(timelist))) {
-    #print( timelist[[i]] )
     if( i==1 ) {
       timetable <- timelist[[i]]
     } else {

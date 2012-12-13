@@ -1,3 +1,21 @@
+# This file is part of the "highstat" R script set
+# Copyright (C) 2012  Bartosz Kostrzewa
+
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
 source("collect_data.R")
 
 plotfunc <- function(samp) {
@@ -59,6 +77,18 @@ plotfunc <- function(samp) {
         hasref <- TRUE
       } else if ( k == 3 ) {
         ar <- NA
+        value <- data[[1]]$cgitnum
+        dvalue <- data[[1]]$dcgitnum
+        valuemed <- data[[1]]$cgitnummed
+        tauint <- NA
+        dtauint <- NA
+        ref <- NA
+        dref <- NA
+        name <- "CG iterations"
+        postname <- "mean"
+        hasref <- TRUE
+      } else if ( k == 4 ) {
+        ar <- NA
         value <- data[[1]]$trajtime
         dvalue <- data[[1]]$dtrajtime
         valuemed <- data[[1]]$trajtimemed
@@ -83,21 +113,8 @@ plotfunc <- function(samp) {
         # when completed, this will become runtimes.csv
         reftime <- merge(lreftime,reftime,all.x=TRUE,all.y=FALSE,by=intersect(colnames(reftime),colnames(lreftime)))
         rownames(reftime) <- samp
-         
-      } else if ( k == 4 ) {
-        ar <- NA
-        value <- data[[1]]$cgitnum
-        dvalue <- data[[1]]$dcgitnum
-        valuemed <- data[[1]]$cgitnummed
-        tauint <- NA
-        dtauint <- NA
-        ref <- NA
-        dref <- NA
-        name <- "CG iterations"
-        postname <- "mean"
-        hasref <- TRUE
       }
-
+         
       # extract the names of the subdirectories for this sample set
       # these will become the tick labels on the plot after shortening
       labels <- row.names(data[[1]])  
@@ -118,7 +135,7 @@ plotfunc <- function(samp) {
         title <- paste(samp,paste(name,postname))
         title <- paste(title,"\n")
         title <- paste(title,topdirname)
-
+        
         miny <- min(value)-0.22*(max(value)-min(value))
         if( miny > min(value)-max(dvalue) ) {
           miny <- min(value)-1.1*max(dvalue)
@@ -134,17 +151,18 @@ plotfunc <- function(samp) {
           plotwitherror(add=TRUE, x = length(value)+1, xlim=c(1,(length(value)+1)),
             y = ref, dy=dref, 
             col="dark red",pch=16,xaxt="n")
+          # add a vertical grid to make identifying runs easier 
+          abline(v=(seq(1,(length(value)+1),1)), col="lightgray",lty="dashed")
         } else {
          plotwitherror(x = c(1:length(value)), xlim=c(1,length(value)),
             y = value, dy=dvalue, ylim=c(miny,maxy), 
             main=title, 
             xlab="",ylab=name,xaxt="n",pch=16) 
+          # add a vertical grid to make identifying runs easier 
+          abline(v=(seq(1,length(value),1)), col="lightgray",lty="dashed")
         }
      
         axis(1,labels=FALSE,tick=TRUE,tck=-0.007,at=c(1:(length(value)+1)))
-
-        # add a vertical grid to make identifying runs easier 
-        abline(v=(seq(1,(length(value)+1),1)), col="lightgray",lty="dashed")
 
         # display median value of the quantity
         points(c(1:length(valuemed)),valuemed) 

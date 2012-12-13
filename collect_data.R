@@ -1,3 +1,21 @@
+# This file is part of the "highstat" R script set
+# Copyright (C) 2012  Bartosz Kostrzewa
+
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
 # given a vector of directories containing output.data, call readoutput
 # to get expectation value and uwerr of plaquette and rectangular
 # plaquette, further, collect first 100 trajectories of plaquette history
@@ -11,10 +29,6 @@
 source("readoutput.R")
 
 collect_data <- function(dirs) {
-# these are samples without a rectangular guage action, we keep track of this so
-# we don't produce excess data
-  norectsamples <- c("hmc0","hmc1","hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
-  
   res <- list()
 # create an empty data frame so that res[[1]] exists!
   res[[1]] <- data.frame(c())
@@ -28,11 +42,10 @@ collect_data <- function(dirs) {
     dirsplit <- strsplit(dirs[i],'/')
     name <- dirsplit[[1]][length(dirsplit[[1]])] 
 
-
-    # this is a problem...
     # test if the current filename refers to one of the samples without a rectangular part
     for( k in c(1:length(norectsamples)) ) {
-      test <- grep(name,pattern=norectsamples[k],fixed=TRUE)
+      pat <- paste(paste("^",norectsamples[k],sep=""),"_",sep="")
+      test <- grep(name,pattern=pat,fixed=FALSE,perl=FALSE)
       if( length(test) > 0 ) {
         norect <- TRUE
       }
@@ -47,11 +60,11 @@ collect_data <- function(dirs) {
     }
 
     #workaround for temporarily broken output.data due to CLOVERNDTRLOG
-    #if( length( grep(name,pattern="ndclover") ) > 0 && length( grep(name,pattern="check_ndclover") ) == 0 ) {
+    # if( length( grep(name,pattern="ndclover") ) > 0 && length( grep(name,pattern="check_ndclover") ) == 0 ) {
     #  brokenndclover <- TRUE
-    #} else {
-    #  brokenndclover <- FALSE
-    #}
+    # } else {
+    #   brokenndclover <- FALSE
+    # }
 
     brokenndclover <- FALSE
 
@@ -64,14 +77,22 @@ collect_data <- function(dirs) {
     }
 
     ofile <- paste(dirs[i],"/output.data",sep="")
-    stdout <- list.files(dirs[i],pattern="stdout*",full.names=TRUE)
-    
+    parafile <- paste(dirs[i],"/output.para",sep="")
+
     if( file.exists(ofile) && ( as.integer( strsplit( system(paste("wc -l",ofile),intern=TRUE), " ")[[1]][[1]] ) > min+minlength ) ) {
       
-      if( length(stdout) > 0 && file.exists(stdout) ) {
-        grepcommand <- paste("grep 'Acceptance rate'",stdout)
+      if( file.exists(parafile) ) {
+        grepcommand <- paste("grep 'Acceptance rate'",parafile)
         grepcommand <- paste(grepcommand,"| awk '{print $5}'")
-        tar <- as.numeric(system(intern=TRUE, grepcommand))
+
+        # when the job is still running the output.para file will not contain the acceptance rate yet
+        # so we check the length explicitly
+        TAR <- as.numeric(system(intern=TRUE, grepcommand))
+        if( length(TAR) >= 1 ) {
+          tar <- round(mean(TAR),digits=2)
+        } else {
+          tar <- NA
+        }
       } else {
         tar <- NA
       }
