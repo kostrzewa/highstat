@@ -74,12 +74,12 @@ readoutput <- function(filename,norect,format,brokenndclover,nocg) {
 
   plaq <- data[min:max,pcol]
   plaqres <- uwerrprimary(plaq)
-  plaqhist <- data[,pcol]
+  plaqhist <- data[,pcol][0:max]
 
   if(!norect) {
     rect <- data[min:max,reccol]
     rectres <- uwerrprimary(rect)
-    recthist <- data[,reccol]
+    recthist <- data[,reccol][0:max]
   } else {
     rect <- NA
     rectres <- NA

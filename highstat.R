@@ -78,6 +78,9 @@ samples <- c("mpihmc1","mpihmc2","mpihmc3","mpihmc4","mpihmc5","mpihmc6","mpihmc
   "hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio",
   "hmc_check_ndclover_tmcloverdet", "hmc_check_ndclover_nocsw_tmcloverdet")
 
+#samples <- c("hmc_ndrat")
+#samples <- c("hmc0")
+
 execs <- c("openmp","openmp_hs","serial","serial_hs",
   "1D_hybrid_hs_2",
   "BGQ_4D_SPI_hybrid_hs_32","BGQ_4D_SPI_hybrid_hs_128",
@@ -85,7 +88,6 @@ execs <- c("openmp","openmp_hs","serial","serial_hs",
   "3D_MPI_hs_8","3D_MPI_hs_16","3D_MPI_hs_24","3D_MPI_hs_32","3D_MPI_hs_64",
   "2D_MPI_hs_16","1D_MPI_hs_16",
   "5.1.6_3D_MPI_hs_8","5.1.6_serial")
-
 
 # for debugging purposes, we can shuffle the vector
 # samples <- sample(samples,size=length(samples))
@@ -99,13 +101,13 @@ norectsamples <- c("mpihmc2","mpihmc4","mpihmc6","mpihmc8",
 # these are reference values for the plaquette and rectangle expectation value 
 reference <- read.table("reference.dat", fill=FALSE,sep=" ", header=TRUE, row.names=1)
 
-min <- 1500
+min <- 1000
 minlength <- 1000
 
 # the limit parameter specifies whether the trajectory series should be cut
 # the trajs parameter specifies where it will be cut ( min + trajs )
-limit <- FALSE
-trajs <- 6000
+limit <- TRUE
+trajs <- 6000-min
 
 topdir
 topdirname 

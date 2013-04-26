@@ -104,7 +104,7 @@ plotfunc <- function(samp) {
         # output the trajectory time to use as a timebase
         # multiply by 1.2 as a fudge factor because the zeuthen cluster has
         # unpredictable performance! 
-        # note: 1.2 * 1000 * trajtime / 3600 (1.2 * hours for 1000 trajectories) 
+        # note: 1.2 * 1000 * trajtime / 3600 = (1.2 * hours for 1000 trajectories) 
         lreftime <- matrix(value/3,ncol=length(value),byrow=TRUE)
         colnames(lreftime) <- shortlabels[1:length(shortlabels)-1]
         rownames(lreftime) <- samp
@@ -114,17 +114,17 @@ plotfunc <- function(samp) {
         reftime <- merge(lreftime,reftime,all.x=TRUE,all.y=FALSE,by=intersect(colnames(reftime),colnames(lreftime)))
         rownames(reftime) <- samp
       }
-         
+      
       # extract the names of the subdirectories for this sample set
       # these will become the tick labels on the plot after shortening
-      labels <- row.names(data[[1]])  
+      labels <- row.names(data[[1]])
+      print(length(labels)) 
       if(hasref) {
         labels <- append(labels,"reference")
       }
       # extract the "addon" from the labels (ie. serial, mpi_hs etc..)
       # these will be the ticklabels on the plot
       shortlabels <- extract_addons(labels,samp)
-
 
       # plot the expectation value, skip if this sample does not contain
       # the particular value (the data collection function would have set it
