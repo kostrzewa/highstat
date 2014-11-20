@@ -66,23 +66,26 @@
 #    source("highstat.R")
 
 library(hadron)
-library(multicore)
+library(parallel)
 
 source("plotfunc.R")
 
 # we use global variables to enable parallelization
 
-samples <- c("mpihmc1","mpihmc2","mpihmc3","mpihmc4","mpihmc5","mpihmc6","mpihmc7","mpihmc8","mpihmc211",
-  "hmc0","hmc_repro_0","hmc1","hmc_repro_1","hmc2","hmc_repro_2","hmc3",
-  "hmc_ndclover","hmc_nosplit_ndclover","hmc_nocsw_ndclover","hmc_nosplit_nocsw_ndclover",
-  "hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio",
-  "hmc_check_ndclover_tmcloverdet", "hmc_check_ndclover_nocsw_tmcloverdet")
+#samples <- c(
+  #"mpihmc1","mpihmc2","mpihmc3","mpihmc4","mpihmc5","mpihmc6","mpihmc7","mpihmc8","mpihmc211",
+  #"hmc0","hmc_repro_0","hmc1","hmc_repro_1","hmc2","hmc_repro_2","hmc3",
+  #"hmc_ndclover","hmc_nosplit_ndclover","hmc_nocsw_ndclover","hmc_nosplit_nocsw_ndclover",
+  #"hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")#,
+  #"hmc_check_ndclover_tmcloverdet", "hmc_check_ndclover_nocsw_tmcloverdet")
 
 #samples <- c("hmc_ndrat")
 #samples <- c("hmc0")
 
+samples <- c("2f_L8T8_ndcloverrat","8f_L8T8_ndcloverrat")
+
 execs <- c("openmp","openmp_hs","serial","serial_hs",
-  "1D_hybrid_hs_2",
+  "1D_hybrid_hs_2","2D_hybrid_hs_4","4D_hybrid_hs_16",
   "BGQ_4D_SPI_hybrid_hs_32","BGQ_4D_SPI_hybrid_hs_128",
   "4D_MPI_hs_16","4D_MPI_hs_32","4D_MPI_hs_64","4D_MPI_hs_128","4D_MPI_hs_256",
   "3D_MPI_hs_8","3D_MPI_hs_16","3D_MPI_hs_24","3D_MPI_hs_32","3D_MPI_hs_64",
@@ -92,7 +95,6 @@ execs <- c("openmp","openmp_hs","serial","serial_hs",
 # for debugging purposes, we can shuffle the vector
 # samples <- sample(samples,size=length(samples))
 
-
 # these samples do not contain a rectangular gauge part
 norectsamples <- c("mpihmc2","mpihmc4","mpihmc6","mpihmc8",
   "hmc0","hmc_repro_0","hmc1","hmc_repro_1",
@@ -101,27 +103,33 @@ norectsamples <- c("mpihmc2","mpihmc4","mpihmc6","mpihmc8",
 # these are reference values for the plaquette and rectangle expectation value 
 reference <- read.table("reference.dat", fill=FALSE,sep=" ", header=TRUE, row.names=1)
 
-min <- 1000
-minlength <- 1000
+min <- 150
+minlength <- 500
 
 # the limit parameter specifies whether the trajectory series should be cut
 # the trajs parameter specifies where it will be cut ( min + trajs )
-limit <- TRUE
+limit <- FALSE
 trajs <- 6000-min
 
 topdir
 topdirname 
 subdir
 
-highstat <- function(tdir) {
+highstat <- function(tdir,name) {
   topdir <<- tdir
 
   # extract the "name" of the top directory
   topdirsplit <- strsplit(topdir,'/')
   topdirname <<- topdirsplit[[1]][ length(topdirsplit[[1]]) ]
+
  
   # directory where plots will be created
-  subdir <<- paste("plots",topdirname,sep="/")
+  if(!missing(name)) {
+    subdir <<- paste("plots",name,sep="/")
+  } else {
+    subdir <<- paste("plots",topdirname,sep="/")
+  }
+  
   if( ! file.exists( subdir ) ) {
     dir.create(subdir)
   }

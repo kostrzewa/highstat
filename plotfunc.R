@@ -44,6 +44,7 @@ plotfunc <- function(samp) {
   rownames(reftime) <- samp
   
   if( !skipall ) {
+    save(data,file=sprintf("%s.Rdata",samp))
     pdf(onefile=TRUE,file=paste(subdir,paste(samp,"expvals.pdf",sep="_"),sep="/"),width=8,height=8)
 
     # we use the same plotting function for all observables
@@ -118,7 +119,7 @@ plotfunc <- function(samp) {
       # extract the names of the subdirectories for this sample set
       # these will become the tick labels on the plot after shortening
       labels <- row.names(data[[1]])
-      print(length(labels)) 
+      #print(length(labels)) 
       if(hasref) {
         labels <- append(labels,"reference")
       }
@@ -143,12 +144,16 @@ plotfunc <- function(samp) {
 
         maxy <- max(value)+max(dvalue)
 
+        print(title)
+        print(miny)
+        print(maxy)
+
         if( hasref ) {
           plotwitherror(x = c(1:length(value)), xlim=c(1,(length(value)+1)),
             y = value, dy=dvalue, ylim=c(miny,maxy), 
             main=title, 
             xlab="",ylab=name,xaxt="n",pch=16) 
-          plotwitherror(add=TRUE, x = length(value)+1, xlim=c(1,(length(value)+1)),
+          plotwitherror(rep=TRUE, x = length(value)+1, xlim=c(1,(length(value)+1)),
             y = ref, dy=dref, 
             col="dark red",pch=16,xaxt="n")
           # add a vertical grid to make identifying runs easier 
@@ -194,9 +199,9 @@ plotfunc <- function(samp) {
       }
 
     } # loop over k, plotting plaquette, rectangle, CG time etc..
-
     # data contains the statistical results in [[1]] and for each output.data 
     # one plaquette and one rectangle history in [[2*j]] and [[2*j+1]] respectively
+
     # the total number of histories for this sample is thus:
     number <- ((length(data)-1)/2)
 
@@ -225,7 +230,7 @@ plotfunc <- function(samp) {
     for( j in 1:number ) {
       title <- paste(labels[j],"plaquette history\n")
       title <- paste(title,topdirname)
-      plot(data[[2*j]],x=c(1:length(data[[2*j]])),type="p",pch=".",main=title,xlab="trajectory",ylab="plaquette")
+      plot(y=data[[2*j]][ 6:length(data[[2*j]]) ],x=c(6:length(data[[2*j]])),type="p",pch=".",main=title,xlab="trajectory",ylab="plaquette")
     }
     dev.off();
 
@@ -240,7 +245,7 @@ plotfunc <- function(samp) {
       for( j in 1:number ) {
         title <- paste(labels[j],"rectangle history\n")
         title <- paste(title,topdirname)
-        plot(data[[2*j+1]],x=c(1:length(data[[2*j+1]])),type="p",pch=".",main=title,xlab="trajectory",ylab="rectangle")
+        plot(y=data[[2*j+1]][ 6:length(data[[2*j+1]]) ],x=c(6:length(data[[2*j+1]])),type="p",pch=".",main=title,xlab="trajectory",ylab="rectangle")
       }
       dev.off();
     }
