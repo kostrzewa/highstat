@@ -26,24 +26,24 @@
 
 library(hadron)
 
-readoutput <- function(filename,norect,format,brokenndclover,nocg) {
+readoutput <- function(filename,norect,format,nocg) {
 
   data <- read.table(filename)
  
   pcol <- format+1
-  reccol <- length(data)
+  reccol <- ncol(data)
 
-  # temporary workaround for broken output.data due to CLOVERNDTRLOG
-  if( brokenndclover ) {
-    cgitnumcol <- format+5+2
-  } else {
-    cgitnumcol <- format+5
-  }
+  # the trajectory time is in the last or second to last column depending on whether we have a rectangle
+  # in the gauge action, so that's fine
+  # the CG iterations however depend on which monomials are defined... as a potentially safe choice
+  # we take the 5th or 6th column from the right
 
   if(norect) {
-    trajtimecol <- length(data)
+    trajtimecol <- ncol(data)
+    cgitnumcol <- ncol(data)-4
   } else {
-    trajtimecol <- length(data)-1
+    trajtimecol <- ncol(data)-1
+    cgitnumcol <- ncol(data)-5
   }
 
   if( length(data[,pcol]) < min+minlength ) {

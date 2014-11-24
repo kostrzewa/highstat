@@ -17,6 +17,7 @@
 
 
 source("collect_data.R")
+source("extract_addons.R")
 
 plotfunc <- function(samp) {
   pat <- paste(paste("^",samp,sep=""),"_",sep="")
@@ -105,7 +106,8 @@ plotfunc <- function(samp) {
         # output the trajectory time to use as a timebase
         # multiply by 1.2 as a fudge factor because the zeuthen cluster has
         # unpredictable performance! 
-        # note: 1.2 * 1000 * trajtime / 3600 = (1.2 * hours for 1000 trajectories) 
+        # note: 1.2 * 1000 * trajtime / 3600 = (1.2 * hours for 1000 trajectories)
+        # so instead of dividing by 3.6, we divide by 3 to get hours
         lreftime <- matrix(value/3,ncol=length(value),byrow=TRUE)
         colnames(lreftime) <- shortlabels[1:length(shortlabels)-1]
         rownames(lreftime) <- samp
@@ -119,7 +121,6 @@ plotfunc <- function(samp) {
       # extract the names of the subdirectories for this sample set
       # these will become the tick labels on the plot after shortening
       labels <- row.names(data[[1]])
-      #print(length(labels)) 
       if(hasref) {
         labels <- append(labels,"reference")
       }
@@ -144,27 +145,29 @@ plotfunc <- function(samp) {
 
         maxy <- max(value)+max(dvalue)
 
-        print(title)
-        print(miny)
-        print(maxy)
-
         if( hasref ) {
+          # set up plot
           plotwitherror(x = c(1:length(value)), xlim=c(1,(length(value)+1)),
             y = value, dy=dvalue, ylim=c(miny,maxy), 
             main=title, 
-            xlab="",ylab=name,xaxt="n",pch=16) 
+            xlab="",ylab=name,xaxt="n",pch=16, type='n')
+          # add a vertical grid to make identifying runs easier
+          abline(v=(seq(1,(length(value)+1),1)), col="lightgray",lty="dashed")
+          # now plot
+          plotwitherror(x = c(1:length(value)), y = value, dy=dvalue, pch=16, rep=TRUE)
           plotwitherror(rep=TRUE, x = length(value)+1, xlim=c(1,(length(value)+1)),
             y = ref, dy=dref, 
             col="dark red",pch=16,xaxt="n")
-          # add a vertical grid to make identifying runs easier 
-          abline(v=(seq(1,(length(value)+1),1)), col="lightgray",lty="dashed")
         } else {
-         plotwitherror(x = c(1:length(value)), xlim=c(1,length(value)),
+          # set up plot
+          plotwitherror(x = c(1:length(value)), xlim=c(1,length(value)),
             y = value, dy=dvalue, ylim=c(miny,maxy), 
             main=title, 
-            xlab="",ylab=name,xaxt="n",pch=16) 
-          # add a vertical grid to make identifying runs easier 
+            xlab="",ylab=name,xaxt="n",pch=16, type='n')
+          # add a vertical grid to make identifying runs easier
           abline(v=(seq(1,length(value),1)), col="lightgray",lty="dashed")
+          # and plot
+          plotwitherror(x = c(1:length(value)), y = value, dy=dvalue, pch=16, rep=TRUE)
         }
      
         axis(1,labels=FALSE,tick=TRUE,tck=-0.007,at=c(1:(length(value)+1)))

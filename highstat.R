@@ -137,7 +137,7 @@ highstat <- function(tdir,name) {
   # process samples in parallel, spawning 8 processes
   # change to lapply in case of errors! 
   # also makes debugging easier in case of errors not related to multicore
-  timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 ,mc.preschedule=FALSE)
+  timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 , mc.preschedule=FALSE)
   #timelist <- lapply( samples, FUN=plotfunc )
 
   # collect timing information in a table
