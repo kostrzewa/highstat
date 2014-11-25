@@ -26,12 +26,12 @@
 
 library(hadron)
 
-readoutput <- function(filename,norect,format,nocg) {
+readoutput <- function(filename,format,norect,nocg) {
 
   data <- read.table(filename)
  
-  pcol <- format+1
-  reccol <- ncol(data)
+  plaqcol <- format+1
+  rectcol <- ncol(data)
 
   # the trajectory time is in the last or second to last column depending on whether we have a rectangle
   # in the gauge action, so that's fine
@@ -46,47 +46,41 @@ readoutput <- function(filename,norect,format,nocg) {
     cgitnumcol <- ncol(data)-5
   }
 
-  if( length(data[,pcol]) < min+minlength ) {
+  if( length(data[,plaqcol]) < min+minlength ) {
     return(NA)
   }
 
   # the limit and trajs parameters are defined in highstat.R
-  if( limit && length(data[,pcol]) > min+trajs ) {
+  if( limit && length(data[,plaqcol]) > min+trajs ) {
     max <- min+trajs
   } else {
-    max <- length(data[,pcol])
+    max <- length(data[,plaqcol])
   }
 
-  trajtimet <- mean(data[min:max,trajtimecol])
-  dtrajtimet <- sd(data[min:max,trajtimecol])
-  trajtimemedt <- median(data[min:max,trajtimecol])
+  plaq.uwerr <- uwerrprimary(data[min:max,plaqcol])
+  plaq.hist <- data[,plaqcol]
 
-  # if the sample has no CG we skip that
+  trajtime.uwerr <- uwerrprimary(data[min:max,trajtimecol] )
+  trajtime.hist <- data[1:max,trajtimecol]
+
   if( nocg ) {
-    cgitnumt <- NA
-    dcgitnumt <- NA
-    cgitnummedt <- NA
+    cgitnum.uwerr <- NA
+    cgitnum.hist <- rep(NA,times=max)
   } else {
-    cgitnumt <- mean(data[min:max,cgitnumcol])
-    dcgitnumt <- sd(data[min:max,cgitnumcol])
-    cgitnummedt <- median(data[min:max,cgitnumcol])
+    cgitnum.uwerr <- uwerrprimary(data[min:max,cgitnumcol])
+    cgitnum.hist <- data[1:max,cgitnumcol]
   }
 
-  plaq <- data[min:max,pcol]
-  plaqres <- uwerrprimary(plaq)
-  plaqhist <- data[,pcol][0:max]
-
-  if(!norect) {
-    rect <- data[min:max,reccol]
-    rectres <- uwerrprimary(rect)
-    recthist <- data[,reccol][0:max]
+  if(norect) {
+    rect.uwerr <- NA
+    rect.hist <- rep(NA,times=max)
   } else {
-    rect <- NA
-    rectres <- NA
-    recthist <- NA
+    rect.uwerr <- uwerrprimary(data[min:max,rectcol])
+    rect.hist <- data[1:max,rectcol]
   }
 
-  return(list(cgitnum=cgitnumt,dcgitnum=dcgitnumt,cgitnummed=cgitnummedt,
-    trajtime=trajtimet,dtrajtime=dtrajtimet,trajtimemed=trajtimemedt,
-    pl=plaqres,rec=rectres,plhist=plaqhist,rechist=recthist))
+  return(list(plaq.hist=plaq.hist,plaq.uwerr=plaq.uwerr,
+              rect.hist=rect.hist,rect.uwerr=rect.uwerr,
+              trajtime.hist=trajtime.hist,trajtime.uwerr=trajtime.uwerr,
+              cgithum.hist=cgitnum.hist,cgitnum.uwerr=cgitnum.uwerr))
 }

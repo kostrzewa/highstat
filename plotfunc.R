@@ -18,6 +18,7 @@
 
 source("collect_data.R")
 source("extract_addons.R")
+source("plot_timeseries.R")
 
 plotfunc <- function(samp) {
   pat <- paste(paste("^",samp,sep=""),"_",sep="")
@@ -136,7 +137,7 @@ plotfunc <- function(samp) {
 
         title <- paste(samp,paste(name,postname))
         title <- paste(title,"\n")
-        title <- paste(title,topdirname)
+        title <- paste(title,name)
         
         miny <- min(value)-0.22*(max(value)-min(value))
         if( miny > min(value)-max(dvalue) ) {
@@ -203,19 +204,21 @@ plotfunc <- function(samp) {
 
     } # loop over k, plotting plaquette, rectangle, CG time etc..
     # data contains the statistical results in [[1]] and for each output.data 
-    # one plaquette and one rectangle history in [[2*j]] and [[2*j+1]] respectively
+    # and starting from [[2]] the histories of the plaquette, rectangle, CG iterations
+    # and trajectory times
+    # so : data[[2+4*(j-1)+x]], x \in [0,1,2,3]
 
     # the total number of histories for this sample is thus:
-    number <- ((length(data)-1)/2)
+    number <- ((length(data)-1)/4)
 
     title <- paste(samp,"initial plaquette history\n")
-    title <- paste(title,topdirname)
+    title <- paste(title,runname)
 
     # plot initial plaquette histories now
     plot(xlab="",ylab="plaquette",y=data[[2]][1:100],x=c(1:100), 
       main=title,xlim=c(1,50*number),xaxt="n",lty=1,type="l")
     for(j in 1:number ) {
-      lines(data[[2*j]][1:100], x=c(1:100)+(j-1)*50) 
+      lines(data[[2+4*(j-1)]][1:100], x=c(1:100)+(j-1)*50) 
     }
     # add a vertical grid to make identifying runs easier 
     abline(v=(seq(1,50*length(value),50)), col="lightgray",lty="dashed")
@@ -232,26 +235,51 @@ plotfunc <- function(samp) {
     pdf(onefile=TRUE,file=paste(subdir,paste(samp,"pl_history.pdf",sep="_"),sep="/"),width=8,height=8)
     for( j in 1:number ) {
       title <- paste(labels[j],"plaquette history\n")
-      title <- paste(title,topdirname)
-      plot(y=data[[2*j]][ 6:length(data[[2*j]]) ],x=c(6:length(data[[2*j]])),type="p",pch=".",main=title,xlab="trajectory",ylab="plaquette")
+      title <- paste(title,runname)
+      # we start at trajectory 6 arbitrarily to get a smaller yrange
+      plot(y=data[[2+4*(j-1)]][ 6:length(data[[2+4*(j-1)]]) ],x=c(6:length(data[[2+4*(j-1)]])),type="p",pch=".",main=title,xlab="trajectory",ylab="plaquette")
     }
     dev.off();
 
-    skip <- FALSE
-    if( samp %in% norectsamples ) {
-      skip = TRUE
+    # and plot the analyzed parts of the histoies 
+    # in seperate plots with a histogram, a periodogram and the UWerr plots
+    for( j in 1:number ) {
+      max <- length(data[[2+4*(j-1)]])
+      if(limit) max <- min+trajs
+      title <- paste(labels[j],"\n")
+      title <- paste(title,runname)
+
+      plot_timeseries(dat=data[[2+4*(j-1)]][ min:max ], trange=c(min,max),
+                      pdf.filename=paste(subdir,paste(labels[j],"plaquette_timeseries.pdf",sep="_"),sep='/'),
+                      filelabel=title,name="plaquette",plotsize=5,ylab="<P>",
+                      titletext=title,periodogram=TRUE)
     }
-    
-    if( !skip ) {
+       
+    if( ! (samp %in% norectsamples) ) {
       # plot rectangle histories if this sample has a rectangle gauge part
       pdf(onefile=TRUE,file=paste(subdir,paste(samp,"rec_history.pdf",sep="_"),sep="/"),width=8,height=8)
       for( j in 1:number ) {
         title <- paste(labels[j],"rectangle history\n")
-        title <- paste(title,topdirname)
-        plot(y=data[[2*j+1]][ 6:length(data[[2*j+1]]) ],x=c(6:length(data[[2*j+1]])),type="p",pch=".",main=title,xlab="trajectory",ylab="rectangle")
+        title <- paste(title,runname)
+      # we start at trajectory 6 arbitrarily to get a smaller yrange
+        plot(y=data[[2+4*(j-1)+1]][ 6:length(data[[2+4*(j-1)+1]]) ],x=c(6:length(data[[2+4*(j-1)+1]])),type="p",pch=".",main=title,xlab="trajectory",ylab="rectangle")
       }
       dev.off();
-    }
+
+      # and plot the analyzed parts of the histoies 
+      # in seperate plots with a histogram, a periodogram and the UWerr plots
+      for( j in 1:number ) {
+        max <- length(data[[2+4*(j-1)+1]])
+        if(limit) max <- min+trajs
+        title <- paste(labels[j],"\n")
+        title <- paste(title,runname)
+  
+        plot_timeseries(dat=data[[2+4*(j-1)+1]][ min:max ], trange=c(min,max),
+                        pdf.filename=paste(subdir,paste(labels[j],"rectangle_timeseries.pdf",sep="_"),sep='/'),
+                        filelabel=title,name="rectangle",plotsize=5,ylab="<P>",
+                        titletext=title,periodogram=TRUE)
+      }
+    } # if norectsamples
   }
   return(reftime)
 }

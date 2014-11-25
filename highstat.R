@@ -114,22 +114,24 @@ trajs <- 6000-min
 topdir
 topdirname 
 subdir
-
-highstat <- function(tdir,name) {
+#runname
+ 
+highstat <- function(tdir,iname) {
   topdir <<- tdir
-
+  
   # extract the "name" of the top directory
   topdirsplit <- strsplit(topdir,'/')
   topdirname <<- topdirsplit[[1]][ length(topdirsplit[[1]]) ]
 
- 
   # directory where plots will be created
-  if(!missing(name)) {
-    subdir <<- paste("plots",name,sep="/")
+  if(!missing(iname)) {
+    subdir <<- paste("plots",iname,sep="/")
+    runname <<- iname
   } else {
     subdir <<- paste("plots",topdirname,sep="/")
+    runname <<- topdirname
   }
-  
+
   if( ! file.exists( subdir ) ) {
     dir.create(subdir)
   }

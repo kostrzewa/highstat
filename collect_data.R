@@ -72,6 +72,7 @@ collect_data <- function(dirs) {
 
     if( file.exists(ofile) && ( as.integer( strsplit( system(paste("wc -l",ofile),intern=TRUE), " ")[[1]][[1]] ) > min+minlength ) ) {
       
+      # this should be replaced by an actual calculation
       if( file.exists(parafile) ) {
         grepcommand <- paste("grep 'Acceptance rate'",parafile)
         grepcommand <- paste(grepcommand,"| awk '{print $5}'")
@@ -88,37 +89,50 @@ collect_data <- function(dirs) {
         tar <- NA
       }
 
-      tres <- readoutput(ofile,norect,format,nocg)
-                
-      trec <- NA
-      tdrec <- NA
-      trecmed <- NA
-      trectauint <- NA
-      trecdtauint <- NA
-      trechist <- NA
+      outdat <- readoutput(filename=ofile,format=format,norect=norect,nocg=nocg)
       
-      # if we have a rectangle part, read out values into temporary variables
-      if( !norect ) {
-        trec <- tres$rec$value
-        tdrec <- tres$rec$dvalue
-        trecmed <- median(tres$rec$data[min:length(tres$rec$data)])
-        trectauint <- tres$rec$tauint
-        trecdtauint <- tres$rec$dtauint
-        trechist <- tres$rechist
+      # add histories to return value
+      res[[2+4*(i-1)-4*skip]] <- outdat$plaq.hist
+      res[[2+4*(i-1)+1-4*skip]] <- outdat$rect.hist
+      res[[2+4*(i-1)+2-4*skip]] <- outdat$cgitnum.hist
+      res[[2+4*(i-1)+3-4*skip]] <- outdat$trajtime.hist 
+
+      # the rectangle and CG iterations may be stored as "NA" in outdat
+      # because the construction of the return value requires accessing elements of "uwerr",
+      # we are going to define some dummy variables here and assign the actual measurements
+      # if they exist
+
+      rec <- NA
+      drec <- NA
+      recmed <- NA
+      rectauint <- NA
+      recdtauint <- NA
+
+      cgitnum <- NA
+      dcgitnum <- NA
+      cgitnummed <- NA
+
+      if(!norect) {
+        rec <- outdat$rect.uwerr$value
+        drec <- outdat$rect.uwerr$dvalue
+        recmed <- median(outdat$rect.uwerr$data)
+        rectauint <- outdat$rect.uwerr$tauint
+        recdtauint <- outdat$rect.uwerr$dtauint
       }
 
-      # add plaquette history and (possibly NA) rectangle history to return value
-      res[[2*i-2*skip]] <- tres$plhist
-      res[[2*i+1-2*skip]] <- trechist
+      if(!nocg) {
+        cgitnum <- outdat$cgitnum.uwerr$value
+        dcgitnum <- outdat$cgitnum.uwerr$dvalue
+        cgitnummed <- median(outdat$cgitnum.uwerr$data)
+      }
 
-      # data frame will contain NA if rectangle part is missing, values otherwise
       tresl <- data.frame(row.names=name,
         list(ar=tar,
-          trajtime=tres$trajtime,dtrajtime=tres$dtrajtime,trajtimemed=tres$trajtimemed,
-          cgitnum=tres$cgitnum,dcgitnum=tres$dcgitnum,cgitnummed=tres$cgitnummed,
-          plaq=tres$pl$value,dplaq=tres$pl$dvalue,plaqmed=median(tres$pl$data[min:length(tres$pl$data)]),
-          plaqtauint=tres$pl$tauint,plaqdtauint=tres$pl$dtauint,
-          rec=trec,drec=tdrec,recmed=trecmed,rectauint=trectauint,recdtauint=trecdtauint))
+          trajtime=outdat$trajtime.uwerr$value, dtrajtime=outdat$trajtime.uwerr$dvalue, trajtimemed=median(outdat$trajtime.uwerr$data),
+          cgitnum=cgitnum,dcgitnum=dcgitnum,cgitnummed=cgitnummed,
+          plaq=outdat$plaq.uwerr$value,dplaq=outdat$plaq.uwerr$dvalue,plaqmed=median(outdat$plaq.uwerr$data),
+          plaqtauint=outdat$plaq.uwerr$tauint,plaqdtauint=outdat$plaq.uwerr$dtauint,
+          rec=rec,drec=drec,recmed=recmed,rectauint=rectauint,recdtauint=recdtauint))
 
       # save the current state of our return value
       tres <- res[[1]]
