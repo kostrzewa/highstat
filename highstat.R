@@ -118,7 +118,7 @@ topdirname
 subdir
 #runname
  
-highstat <- function(tdir,iname) {
+highstat <- function(tdir,iname,serial=FALSE) {
   topdir <<- tdir
   
   # extract the "name" of the top directory
@@ -141,8 +141,11 @@ highstat <- function(tdir,iname) {
   # process samples in parallel, spawning 8 processes
   # change to lapply in case of errors! 
   # also makes debugging easier in case of errors not related to multicore
-  #timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 , mc.preschedule=FALSE)
-  timelist <- lapply( samples, FUN=plotfunc )
+  if(serial) {
+    timelist <- lapply( samples, FUN=plotfunc )
+  } else {
+    timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 , mc.preschedule=FALSE)
+  }
 
   # collect timing information in a table
   for (i in seq(1,length(timelist))) {
