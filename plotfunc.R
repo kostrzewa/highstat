@@ -49,6 +49,12 @@ plotfunc <- function(samp) {
     save(data,file=sprintf("%s.Rdata",samp))
     pdf(onefile=TRUE,file=paste(subdir,paste(samp,"expvals.pdf",sep="_"),sep="/"),width=8,height=8)
 
+    timeseries_subdir <- paste(subdir,"timeseries",sep="/")
+    
+    # create plot directories if they don't exist 
+    dir.create(subdir)
+    dir.create(timeseries_subdir)
+  
     # we use the same plotting function for all observables
     # we collect the values in temporary variables so we have to write the 
     # plotting routine only once
@@ -231,55 +237,51 @@ plotfunc <- function(samp) {
     # close the expvals file for the current sample
     dev.off();
 
-    # plot full plaquette histories in a separate file
-    pdf(onefile=TRUE,file=paste(subdir,paste(samp,"pl_history.pdf",sep="_"),sep="/"),width=8,height=8)
-    for( j in 1:number ) {
-      title <- paste(labels[j],"plaquette history\n")
-      title <- paste(title,runname)
-      # we start at trajectory 6 arbitrarily to get a smaller yrange
-      plot(y=data[[2+4*(j-1)]][ 6:length(data[[2+4*(j-1)]]) ],x=c(6:length(data[[2+4*(j-1)]])),type="p",pch=".",main=title,xlab="trajectory",ylab="plaquette")
-    }
-    dev.off();
+    # plot full histories and timeseries analyses in separate files
+    obs.names <- c("plaquette","trajtime","rectangle","cgitnum")
+    obs.labels <- c("<P>",expression(T[traj]),"<R>",expression(N[CG]))
+    for( obs.idx in 1:4 ) {
+      if( obs.names[obs.idx] == "rectangle" ) {
+        if( samp %in% norectsamples ) {
+          next
+        }
+      } else if ( obs.names[obs.idx] == "cgitnum" ) {
+        if( samp %in% nocgsamples ) {
+          next
+        }
+      }
 
-    # and plot the analyzed parts of the histoies 
-    # in seperate plots with a histogram, a periodogram and the UWerr plots
-    for( j in 1:number ) {
-      max <- length(data[[2+4*(j-1)]])
-      if(limit) max <- min+trajs
-      title <- paste(labels[j],"\n")
-      title <- paste(title,runname)
+      histories.pdf.filename <- paste(subdir,paste(samp,paste(obs.names[obs.idx],"histories.pdf",sep="_"),sep="_"),sep="/")
+      obs.history.title <- paste(obs.names[obs.idx],"history \n")
 
-      plot_timeseries(dat=data[[2+4*(j-1)]][ min:max ], trange=c(min,max),
-                      pdf.filename=paste(subdir,paste(labels[j],"plaquette_timeseries.pdf",sep="_"),sep='/'),
-                      filelabel=title,name="plaquette",plotsize=5,ylab="<P>",
-                      titletext=title,periodogram=TRUE)
-    }
-       
-    if( ! (samp %in% norectsamples) ) {
-      # plot rectangle histories if this sample has a rectangle gauge part
-      pdf(onefile=TRUE,file=paste(subdir,paste(samp,"rec_history.pdf",sep="_"),sep="/"),width=8,height=8)
+      pdf(onefile=TRUE,file=histories.pdf.filename,width=7,height=7)
       for( j in 1:number ) {
-        title <- paste(labels[j],"rectangle history\n")
+        data.idx <- 2+4*(j-1)+(obs.idx-1)
+        title <- paste(labels[j],obs.history.title)
         title <- paste(title,runname)
-      # we start at trajectory 6 arbitrarily to get a smaller yrange
-        plot(y=data[[2+4*(j-1)+1]][ 6:length(data[[2+4*(j-1)+1]]) ],x=c(6:length(data[[2+4*(j-1)+1]])),type="p",pch=".",main=title,xlab="trajectory",ylab="rectangle")
+        # we start at trajectory 6 arbitrarily to get a smaller yrange
+        plot(y=data[[data.idx]][ 6:length(data[[data.idx]]) ],x=c(6:length(data[[data.idx]])),
+             type="p",pch=".",main=title,xlab=expression(t[HMC]),ylab=eval(expression(obs.labels[obs.idx])) )
       }
       dev.off();
-
-      # and plot the analyzed parts of the histoies 
+      
+      # and plot the analyzed parts of the histoies
       # in seperate plots with a histogram, a periodogram and the UWerr plots
       for( j in 1:number ) {
-        max <- length(data[[2+4*(j-1)+1]])
+        data.idx <- 2+4*(j-1)+(obs.idx-1)
+        max <- length(data[[data.idx]])
         if(limit) max <- min+trajs
         title <- paste(labels[j],"\n")
         title <- paste(title,runname)
-  
-        plot_timeseries(dat=data[[2+4*(j-1)+1]][ min:max ], trange=c(min,max),
-                        pdf.filename=paste(subdir,paste(labels[j],"rectangle_timeseries.pdf",sep="_"),sep='/'),
-                        filelabel=title,name="rectangle",plotsize=5,ylab="<P>",
+
+        obs.timeseries.pdf.filename <- paste(timeseries_subdir,paste(labels[j],paste(obs.names[obs.idx],"timeseries.pdf",sep="_"),sep="_"),sep='/')
+
+        plot_timeseries(dat=data[[data.idx]][ min:max ], trange=c(min,max),
+                        pdf.filename=obs.timeseries.pdf.filename,
+                        filelabel=title,name=obs.names[obs.idx],plotsize=5,ylab=expression(obs.labels[obs.idx]),
                         titletext=title,periodogram=TRUE)
       }
-    } # if norectsamples
+    } # for(obs.idx)
   }
   return(reftime)
 }

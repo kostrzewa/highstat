@@ -82,5 +82,5 @@ readoutput <- function(filename,format,norect,nocg) {
   return(list(plaq.hist=plaq.hist,plaq.uwerr=plaq.uwerr,
               rect.hist=rect.hist,rect.uwerr=rect.uwerr,
               trajtime.hist=trajtime.hist,trajtime.uwerr=trajtime.uwerr,
-              cgithum.hist=cgitnum.hist,cgitnum.uwerr=cgitnum.uwerr))
+              cgitnum.hist=cgitnum.hist,cgitnum.uwerr=cgitnum.uwerr))
 }

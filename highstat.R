@@ -99,6 +99,8 @@ execs <- c("openmp","openmp_hs","serial","serial_hs",
 norectsamples <- c("mpihmc2","mpihmc4","mpihmc6","mpihmc8",
   "hmc0","hmc_repro_0","hmc1","hmc_repro_1",
   "hmc_cloverdet","hmc_tmcloverdet","hmc_tmcloverdetratio")
+
+nocgsamples <- c("hmc_nosplit_nocsw_ndclover","nosplit_ndclover")
  
 # these are reference values for the plaquette and rectangle expectation value 
 reference <- read.table("reference.dat", fill=FALSE,sep=" ", header=TRUE, row.names=1)
@@ -139,8 +141,8 @@ highstat <- function(tdir,iname) {
   # process samples in parallel, spawning 8 processes
   # change to lapply in case of errors! 
   # also makes debugging easier in case of errors not related to multicore
-  timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 , mc.preschedule=FALSE)
-  #timelist <- lapply( samples, FUN=plotfunc )
+  #timelist <- mclapply( samples, FUN=plotfunc , mc.cores = 8 , mc.preschedule=FALSE)
+  timelist <- lapply( samples, FUN=plotfunc )
 
   # collect timing information in a table
   for (i in seq(1,length(timelist))) {

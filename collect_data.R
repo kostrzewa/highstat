@@ -93,9 +93,9 @@ collect_data <- function(dirs) {
       
       # add histories to return value
       res[[2+4*(i-1)-4*skip]] <- outdat$plaq.hist
-      res[[2+4*(i-1)+1-4*skip]] <- outdat$rect.hist
-      res[[2+4*(i-1)+2-4*skip]] <- outdat$cgitnum.hist
-      res[[2+4*(i-1)+3-4*skip]] <- outdat$trajtime.hist 
+      res[[2+4*(i-1)+1-4*skip]] <- outdat$trajtime.hist
+      res[[2+4*(i-1)+2-4*skip]] <- outdat$rect.hist
+      res[[2+4*(i-1)+3-4*skip]] <- outdat$cgitnum.hist
 
       # the rectangle and CG iterations may be stored as "NA" in outdat
       # because the construction of the return value requires accessing elements of "uwerr",
