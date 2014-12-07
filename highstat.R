@@ -113,10 +113,9 @@ minlength <- 500
 limit <- FALSE
 trajs <- 6000-min
 
-topdir
-topdirname 
-subdir
-#runname
+topdir <- NULL
+topdirname <- NULL
+subdir <- NULL
  
 highstat <- function(tdir,iname,serial=FALSE) {
   topdir <<- tdir
